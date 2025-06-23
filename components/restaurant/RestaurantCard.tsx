@@ -1,30 +1,54 @@
+import { favoriteService } from '@/services/favoriteService';
 import { Restaurant } from '@/types';
 import { LinearGradient } from 'expo-linear-gradient';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 
 interface RestaurantCardProps {
     restaurant: Restaurant;
     onPress: () => void;
     showIndex?: number;
+    onFavoriteToggle?: (isFavorite: boolean) => void;
 }
 
-export function RestaurantCard({ restaurant, onPress, showIndex }: RestaurantCardProps) {
+export function RestaurantCard({ restaurant, onPress, showIndex, onFavoriteToggle }: RestaurantCardProps) {
+    const [isFavorite, setIsFavorite] = useState(false);
+    const [favoriteLoading, setFavoriteLoading] = useState(false);
+
+    useEffect(() => {
+        checkFavoriteStatus();
+    }, [restaurant.id]);
+
+    const checkFavoriteStatus = async () => {
+        try {
+            const favorite = await favoriteService.isFavorite(restaurant.id);
+            setIsFavorite(favorite);
+        } catch (error) {
+            console.error('Error checking favorite status:', error);
+        }
+    };
+
+    const handleFavoriteToggle = async (e: any) => {
+        e.stopPropagation(); // Prevent card press
+        try {
+            setFavoriteLoading(true);
+            const newStatus = await favoriteService.toggleFavorite(restaurant);
+            setIsFavorite(newStatus);
+            onFavoriteToggle?.(newStatus);
+        } catch (error) {
+            console.error('Error toggling favorite:', error);
+        } finally {
+            setFavoriteLoading(false);
+        }
+    };
+
     const renderPriceRange = (priceRange: number) => {
         return '$'.repeat(priceRange) + '·'.repeat(4 - priceRange);
     };
 
     const renderStars = (rating: number) => {
-        const fullStars = Math.floor(rating);
-        const hasHalfStar = rating % 1 >= 0.5;
-        const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
-
         return (
-            <Text style={styles.stars}>
-                {'★'.repeat(fullStars)}
-                {hasHalfStar ? '☆' : ''}
-                {'☆'.repeat(emptyStars)}
-            </Text>
+            <Text style={styles.stars}>{'★'.repeat(Math.floor(rating))}</Text>
         );
     };
 
@@ -132,6 +156,25 @@ export function RestaurantCard({ restaurant, onPress, showIndex }: RestaurantCar
                             </Text>
                         )}
                     </View>
+
+                    {/* Favorite Button */}
+                    <Pressable
+                        style={styles.favoriteButton}
+                        onPress={handleFavoriteToggle}
+                        disabled={favoriteLoading}
+                    >
+                        <LinearGradient
+                            colors={isFavorite
+                                ? ['rgba(0,0,0,0.5)', 'rgba(0,0,0,0.8)']
+                                : ['rgba(0,0,0,0.5)', 'rgba(0,0,0,0.7)']
+                            }
+                            style={styles.favoriteButtonGradient}
+                        >
+                            <Text style={styles.favoriteIcon}>
+                                {favoriteLoading ? '⏳' : isFavorite ? '❤️' : '🤍'}
+                            </Text>
+                        </LinearGradient>
+                    </Pressable>
                 </View>
             </LinearGradient>
         </Pressable>
@@ -299,5 +342,22 @@ const styles = StyleSheet.create({
         fontSize: 10,
         color: '#9ca3af',
         fontStyle: 'italic',
+    },
+    favoriteButton: {
+        position: 'absolute',
+        bottom: 12,
+        right: 12,
+        borderRadius: 20,
+        zIndex: 2,
+    },
+    favoriteButtonGradient: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    favoriteIcon: {
+        fontSize: 20,
     },
 }); 

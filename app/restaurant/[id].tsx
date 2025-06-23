@@ -6,6 +6,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { favoriteService } from '@/services/favoriteService';
 
 export default function RestaurantDetailsScreen() {
     const { id } = useLocalSearchParams();
@@ -13,6 +14,8 @@ export default function RestaurantDetailsScreen() {
     const [reviews, setReviews] = useState<Review[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [isFavorite, setIsFavorite] = useState(false);
+    const [favoriteLoading, setFavoriteLoading] = useState(false);
 
     useEffect(() => {
         if (id) {
@@ -33,6 +36,10 @@ export default function RestaurantDetailsScreen() {
             if (restaurantData) {
                 setRestaurant(restaurantData);
                 setReviews(reviewsData);
+
+                // Check if restaurant is favorited
+                const favoriteStatus = await favoriteService.isFavorite(restaurantData.id);
+                setIsFavorite(favoriteStatus);
             } else {
                 setError('Restaurant not found');
             }
@@ -59,6 +66,20 @@ export default function RestaurantDetailsScreen() {
 
     const renderPriceRange = (priceRange: number) => {
         return '$'.repeat(priceRange) + '·'.repeat(4 - priceRange);
+    };
+
+    const handleFavoriteToggle = async () => {
+        if (!restaurant) return;
+
+        try {
+            setFavoriteLoading(true);
+            const newStatus = await favoriteService.toggleFavorite(restaurant);
+            setIsFavorite(newStatus);
+        } catch (error) {
+            console.error('Error toggling favorite:', error);
+        } finally {
+            setFavoriteLoading(false);
+        }
     };
 
     if (loading) {
@@ -103,6 +124,25 @@ export default function RestaurantDetailsScreen() {
                         colors={['transparent', 'rgba(0,0,0,0.3)'] as [string, string]}
                         style={styles.imageOverlay}
                     />
+
+                    {/* Favorite Button */}
+                    <Pressable
+                        style={styles.favoriteButton}
+                        onPress={handleFavoriteToggle}
+                        disabled={favoriteLoading}
+                    >
+                        <LinearGradient
+                            colors={isFavorite
+                                ? ['rgba(255,255,255,0.9)', 'rgba(255,255,255,0.3)']
+                                : ['rgba(255,255,255,0.9)', 'rgba(255,255,255,0.3)']
+                            }
+                            style={styles.favoriteButtonGradient}
+                        >
+                            <Text style={[styles.favoriteIcon, { color: isFavorite ? '#ffffff' : '#ef4444' }]}>
+                                {favoriteLoading ? '⏳' : isFavorite ? '❤️' : '🤍'}
+                            </Text>
+                        </LinearGradient>
+                    </Pressable>
 
                     {/* Restaurant Info Overlay */}
                     <View style={styles.heroOverlay}>
@@ -579,5 +619,27 @@ const styles = StyleSheet.create({
         color: '#ffffff',
         fontSize: 16,
         fontWeight: '600',
+    },
+    favoriteButton: {
+        position: 'absolute',
+        bottom: 30,
+        right: 20,
+        borderRadius: 25,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 8,
+        elevation: 8,
+        zIndex: 10,
+    },
+    favoriteButtonGradient: {
+        width: 50,
+        height: 50,
+        borderRadius: 25,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    favoriteIcon: {
+        fontSize: 24,
     },
 }); 

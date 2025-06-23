@@ -1,5 +1,6 @@
 import { LoadingState } from '@/components/common/LoadingState';
 import { RestaurantCard } from '@/components/restaurant/RestaurantCard';
+import { favoriteService } from '@/services/favoriteService';
 import { searchRestaurants } from '@/services/mockData';
 import { Restaurant, SearchResult } from '@/types';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -31,6 +32,13 @@ export default function SearchResultsScreen() {
             });
 
             setSearchResult(result);
+
+            // Save to search history
+            await favoriteService.addToSearchHistory(
+                query as string || '',
+                location as string || '',
+                result.totalCount
+            );
         } catch (err) {
             setError('Failed to search restaurants. Please try again.');
         } finally {

@@ -1,16 +1,81 @@
 import { LinearGradient } from 'expo-linear-gradient';
-import React from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import React, { useCallback, useState } from 'react';
+import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { favoriteService } from '@/services/favoriteService';
+import { SearchHistoryItem } from '@/services/favoriteService';
+import { useFocusEffect } from '@react-navigation/native';
+import { LoadingState } from '@/components/common/LoadingState';
+import { router } from 'expo-router';
 
 export default function HistoryScreen() {
+    const [searchHistory, setSearchHistory] = useState<SearchHistoryItem[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [refreshing, setRefreshing] = useState(false);
+
+    useFocusEffect(
+        useCallback(() => {
+            loadSearchHistory();
+        }, [])
+    );
+
+    const loadSearchHistory = async () => {
+        try {
+            setLoading(true);
+            const history = await favoriteService.getSearchHistory();
+            setSearchHistory(history);
+        } catch (error) {
+            console.error('Error loading search history:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleRefresh = async () => {
+        setRefreshing(true);
+        await loadSearchHistory();
+        setRefreshing(false);
+    };
+
+    const handleSearchAgain = (item: SearchHistoryItem) => {
+        const query = encodeURIComponent(item.query);
+        const location = encodeURIComponent(item.location);
+        router.push(`/search/results?query=${query}&location=${location}`);
+    };
+
+    const handleRemoveItem = async (itemId: string) => {
+        try {
+            await favoriteService.removeSearchHistoryItem(itemId);
+            setSearchHistory(prev => prev.filter(item => item.id !== itemId));
+        } catch (error) {
+            console.error('Error removing search history item:', error);
+        }
+    };
+
+    const handleClearAll = async () => {
+        try {
+            await favoriteService.clearSearchHistory();
+            setSearchHistory([]);
+        } catch (error) {
+            console.error('Error clearing search history:', error);
+        }
+    };
+
+    if (loading) {
+        return <LoadingState message="Loading your search history..." />;
+    }
     return (
         <SafeAreaView style={styles.container}>
             <LinearGradient
                 colors={['#4facfe', '#00f2fe'] as [string, string]}
                 style={styles.backgroundGradient}
             >
-                <ScrollView showsVerticalScrollIndicator={false}>
+                <ScrollView
+                    showsVerticalScrollIndicator={false}
+                    refreshControl={
+                        <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+                    }
+                >
                     {/* Header Section */}
                     <View style={styles.headerSection}>
                         <View style={styles.headerIconContainer}>
@@ -18,88 +83,129 @@ export default function HistoryScreen() {
                         </View>
                         <Text style={styles.headerTitle}>Search History</Text>
                         <Text style={styles.headerSubtitle}>
-                            Your recent searches
+                            {searchHistory.length === 0
+                                ? "Your recent searches will appear here"
+                                : `${searchHistory.length} recent search${searchHistory.length === 1 ? '' : 'es'}`
+                            }
                         </Text>
                     </View>
 
                     {/* Content Container */}
                     <View style={styles.contentContainer}>
-                        {/* Empty State */}
-                        <View style={styles.emptyStateCard}>
-                            <LinearGradient
-                                colors={['#ffffff', '#f8f9fb'] as [string, string]}
-                                style={styles.emptyStateGradient}
-                            >
-                                <View style={styles.emptyIconContainer}>
-                                    <Text style={styles.emptyStateIcon}>📱</Text>
+                        {searchHistory.length === 0 ? (
+                            <View style={styles.emptyStateContainer}>
+                                {/* Empty State */}
+                                <View style={styles.emptyStateCard}>
+                                    <LinearGradient
+                                        colors={['#ffffff', '#f8f9fb'] as [string, string]}
+                                        style={styles.emptyStateGradient}
+                                    >
+                                        <View style={styles.emptyIconContainer}>
+                                            <Text style={styles.emptyStateIcon}>📱</Text>
+                                        </View>
+                                        <Text style={styles.emptyTitle}>No Search History</Text>
+                                        <Text style={styles.emptyText}>
+                                            Your recent searches will appear here. Start searching for restaurants
+                                            to build your search history!
+                                        </Text>
+                                    </LinearGradient>
                                 </View>
-                                <Text style={styles.emptyTitle}>No Search History</Text>
-                                <Text style={styles.emptyText}>
-                                    Your recent searches will appear here. Start searching for restaurants
-                                    to build your search history!
-                                </Text>
-                            </LinearGradient>
-                        </View>
 
-                        {/* Info Section */}
-                        <View style={styles.infoCard}>
-                            <LinearGradient
-                                colors={['#ffffff', '#f8f9fb'] as [string, string]}
-                                style={styles.infoGradient}
-                            >
-                                <View style={styles.infoHeader}>
-                                    <Text style={styles.infoIcon}>🔍</Text>
-                                    <Text style={styles.infoTitle}>Search History Features</Text>
+                                {/* Info Section */}
+                                <View style={styles.infoCard}>
+                                    <LinearGradient
+                                        colors={['#ffffff', '#f8f9fb'] as [string, string]}
+                                        style={styles.infoGradient}
+                                    >
+                                        <View style={styles.infoHeader}>
+                                            <Text style={styles.infoIcon}>🔍</Text>
+                                            <Text style={styles.infoTitle}>Search History Features</Text>
+                                        </View>
+                                        <View style={styles.infoList}>
+                                            <View style={styles.infoItem}>
+                                                <Text style={styles.infoBullet}>⚡</Text>
+                                                <Text style={styles.infoText}>Quick access to recent searches</Text>
+                                            </View>
+                                            <View style={styles.infoItem}>
+                                                <Text style={styles.infoBullet}>👀</Text>
+                                                <Text style={styles.infoText}>See previously viewed restaurants</Text>
+                                            </View>
+                                            <View style={styles.infoItem}>
+                                                <Text style={styles.infoBullet}>🗑️</Text>
+                                                <Text style={styles.infoText}>Clear history anytime</Text>
+                                            </View>
+                                        </View>
+                                    </LinearGradient>
                                 </View>
-                                <View style={styles.infoList}>
-                                    <View style={styles.infoItem}>
-                                        <Text style={styles.infoBullet}>⚡</Text>
-                                        <Text style={styles.infoText}>Quick access to recent searches</Text>
-                                    </View>
-                                    <View style={styles.infoItem}>
-                                        <Text style={styles.infoBullet}>👀</Text>
-                                        <Text style={styles.infoText}>See previously viewed restaurants</Text>
-                                    </View>
-                                    <View style={styles.infoItem}>
-                                        <Text style={styles.infoBullet}>🗑️</Text>
-                                        <Text style={styles.infoText}>Clear history anytime</Text>
-                                    </View>
-                                </View>
-                            </LinearGradient>
-                        </View>
 
-                        {/* Tips Section */}
-                        <View style={styles.tipsCard}>
-                            <LinearGradient
-                                colors={['#ffffff', '#f8f9fb'] as [string, string]}
-                                style={styles.tipsGradient}
-                            >
-                                <View style={styles.tipsHeader}>
-                                    <Text style={styles.tipsIcon}>💡</Text>
-                                    <Text style={styles.tipsTitle}>Pro Tips</Text>
+                                {/* Tips Section */}
+                                <View style={styles.tipsCard}>
+                                    <LinearGradient
+                                        colors={['#ffffff', '#f8f9fb'] as [string, string]}
+                                        style={styles.tipsGradient}
+                                    >
+                                        <View style={styles.tipsHeader}>
+                                            <Text style={styles.tipsIcon}>💡</Text>
+                                            <Text style={styles.tipsTitle}>Pro Tips</Text>
+                                        </View>
+                                        <View style={styles.tipsList}>
+                                            <View style={styles.tipItem}>
+                                                <Text style={styles.tipBullet}>🎯</Text>
+                                                <Text style={styles.tipText}>
+                                                    Frequently searched restaurants will appear at the top
+                                                </Text>
+                                            </View>
+                                            <View style={styles.tipItem}>
+                                                <Text style={styles.tipBullet}>📍</Text>
+                                                <Text style={styles.tipText}>
+                                                    Location-based searches help you discover nearby gems
+                                                </Text>
+                                            </View>
+                                            <View style={styles.tipItem}>
+                                                <Text style={styles.tipBullet}>⏰</Text>
+                                                <Text style={styles.tipText}>
+                                                    History shows the most recent 50 searches
+                                                </Text>
+                                            </View>
+                                        </View>
+                                    </LinearGradient>
                                 </View>
-                                <View style={styles.tipsList}>
-                                    <View style={styles.tipItem}>
-                                        <Text style={styles.tipBullet}>🎯</Text>
-                                        <Text style={styles.tipText}>
-                                            Frequently searched restaurants will appear at the top
-                                        </Text>
+                            </View>
+                        ) : (
+                            <View style={styles.historyList}>
+                                {searchHistory.map((item, index) => (
+                                    <View key={item.id} style={styles.historyItem}>
+                                        <View style={styles.historyItemView}>
+                                            <Text style={styles.historyItemTextNumber}>
+                                                {index + 1}.
+                                            </Text>
+                                            <Text style={styles.historyItemText}>
+                                                {item.query}
+                                            </Text>
+                                            <Text style={styles.historyItemText}>
+                                                {item.location}
+                                            </Text>
+                                            <Text style={styles.historyItemText}>
+                                                {new Date(item.timestamp).toLocaleString()}
+                                            </Text>
+                                        </View>
+                                        <View style={styles.historyItemView}>
+                                            <Text style={styles.historyItemResultNumber}>
+                                                {item.resultCount} results
+                                            </Text>
+                                            <View style={styles.historyButtons}>
+                                                <Pressable style={styles.historyAction} onPress={() => handleSearchAgain(item)}>
+                                                    <Text style={styles.historyActionText}>Search Again</Text>
+                                                </Pressable>
+                                                <Pressable style={styles.historyAction} onPress={() => handleRemoveItem(item.id)}>
+                                                    <Text style={styles.historyActionText}>Remove</Text>
+                                                </Pressable>
+                                            </View>
+                                        </View>
                                     </View>
-                                    <View style={styles.tipItem}>
-                                        <Text style={styles.tipBullet}>📍</Text>
-                                        <Text style={styles.tipText}>
-                                            Location-based searches help you discover nearby gems
-                                        </Text>
-                                    </View>
-                                    <View style={styles.tipItem}>
-                                        <Text style={styles.tipBullet}>⏰</Text>
-                                        <Text style={styles.tipText}>
-                                            History shows the most recent 50 searches
-                                        </Text>
-                                    </View>
-                                </View>
-                            </LinearGradient>
-                        </View>
+                                ))}
+                            </View>
+                        )}
                     </View>
                 </ScrollView>
             </LinearGradient>
@@ -285,4 +391,70 @@ const styles = StyleSheet.create({
         flex: 1,
         lineHeight: 22,
     },
+    emptyStateContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    historyList: {
+        gap: 16,
+    },
+    historyItem: {
+        flexDirection: 'column',
+        alignItems: 'center',
+        padding: 16,
+        backgroundColor: '#ffffff',
+        borderRadius: 12,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 3,
+        width: '100%',
+    },
+    historyItemView: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        width: '100%',
+        gap: '10px',
+
+    },
+    historyItemTextNumber: {
+        fontSize: 16,
+        color: 'white',
+        fontWeight: 'bold',
+        display: 'flex',
+        textAlign: 'center',
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#007bff',
+        borderRadius: 30,
+        padding: 5,
+
+    },
+    historyItemText: {
+        fontSize: 16,
+        color: '#374151',
+    },
+    historyButtons: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+    },
+    historyAction: {
+        padding: 8,
+        backgroundColor: '#007bff',
+        borderRadius: 8,
+        marginLeft: 16,
+    },
+    historyActionText: {
+        color: '#ffffff',
+        fontSize: 14,
+        fontWeight: 'bold',
+    },
+    historyItemResultNumber: {
+        fontSize: 16,
+        color: '#374151',
+    }
 }); 
