@@ -1,13 +1,13 @@
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function SearchScreen() {
     const [searchQuery, setSearchQuery] = useState('');
     const [location, setLocation] = useState('');
+    const [focusedInput, setFocusedInput] = useState<string | null>(null);
 
     const handleSearch = () => {
         if (searchQuery.trim() || location.trim()) {
@@ -18,82 +18,153 @@ export default function SearchScreen() {
 
     return (
         <SafeAreaView style={styles.container}>
-            <ScrollView>
-                <ThemedView style={styles.content}>
-                    {/* Search Form */}
-                    <View style={styles.searchForm}>
-                        <ThemedText type="subtitle" style={styles.formTitle}>
-                            Find Restaurants
-                        </ThemedText>
-
-                        <View style={styles.inputGroup}>
-                            <ThemedText style={styles.inputLabel}>Restaurant Name</ThemedText>
-                            <TextInput
-                                style={styles.textInput}
-                                placeholder="Enter restaurant name..."
-                                value={searchQuery}
-                                onChangeText={setSearchQuery}
-                                placeholderTextColor="#8E8E93"
-                            />
+            <LinearGradient
+                colors={['#667eea', '#764ba2'] as [string, string]}
+                style={styles.backgroundGradient}
+            >
+                <ScrollView showsVerticalScrollIndicator={false}>
+                    {/* Header Section */}
+                    <View style={styles.headerSection}>
+                        <View style={styles.headerIconContainer}>
+                            <Text style={styles.headerIcon}>🔍</Text>
                         </View>
-
-                        <View style={styles.inputGroup}>
-                            <ThemedText style={styles.inputLabel}>Location</ThemedText>
-                            <TextInput
-                                style={styles.textInput}
-                                placeholder="Enter city, address, or zip code..."
-                                value={location}
-                                onChangeText={setLocation}
-                                placeholderTextColor="#8E8E93"
-                            />
-                        </View>
-
-                        <Pressable
-                            style={[styles.searchButton, (!searchQuery.trim() && !location.trim()) && styles.searchButtonDisabled]}
-                            onPress={handleSearch}
-                            disabled={!searchQuery.trim() && !location.trim()}
-                        >
-                            <ThemedText style={styles.searchButtonText}>
-                                🔍 Search Restaurants
-                            </ThemedText>
-                        </Pressable>
+                        <Text style={styles.headerTitle}>Find Restaurants</Text>
+                        <Text style={styles.headerSubtitle}>
+                            Search across all review platforms
+                        </Text>
                     </View>
 
-                    {/* Search Tips */}
-                    <ThemedView style={styles.tipsSection}>
-                        <ThemedText type="defaultSemiBold" style={styles.tipsTitle}>
-                            Search Tips
-                        </ThemedText>
-                        <ThemedText style={styles.tipText}>
-                            • Enter just a restaurant name to search globally
-                        </ThemedText>
-                        <ThemedText style={styles.tipText}>
-                            • Add location for local results
-                        </ThemedText>
-                        <ThemedText style={styles.tipText}>
-                            • Try searching by cuisine type (e.g., "Italian", "Sushi")
-                        </ThemedText>
-                    </ThemedView>
+                    {/* Content Container */}
+                    <View style={styles.contentContainer}>
+                        {/* Search Form */}
+                        <View style={styles.searchForm}>
+                            <View style={styles.inputGroup}>
+                                <Text style={styles.inputLabel}>Restaurant Name</Text>
+                                <View style={[
+                                    styles.inputContainer,
+                                    focusedInput === 'restaurant' && styles.inputContainerFocused
+                                ]}>
+                                    <LinearGradient
+                                        colors={['#ffffff', '#f8f9fb'] as [string, string]}
+                                        style={styles.inputGradient}
+                                    >
+                                        <Text style={styles.inputIcon}>🏪</Text>
+                                        <TextInput
+                                            style={styles.textInput}
+                                            placeholder="Enter restaurant name..."
+                                            value={searchQuery}
+                                            onChangeText={setSearchQuery}
+                                            onFocus={() => setFocusedInput('restaurant')}
+                                            onBlur={() => setFocusedInput(null)}
+                                            placeholderTextColor="#9ca3af"
+                                        />
+                                    </LinearGradient>
+                                </View>
+                            </View>
 
-                    {/* Popular Searches */}
-                    <ThemedView style={styles.popularSection}>
-                        <ThemedText type="defaultSemiBold" style={styles.popularTitle}>
-                            Popular Searches
-                        </ThemedText>
-                        <View style={styles.popularTags}>
-                            {['Pizza', 'Sushi', 'Burger', 'Thai', 'Mexican', 'Italian'].map((tag) => (
-                                <Pressable
-                                    key={tag}
-                                    style={styles.popularTag}
-                                    onPress={() => setSearchQuery(tag)}
+                            <View style={styles.inputGroup}>
+                                <Text style={styles.inputLabel}>Location</Text>
+                                <View style={[
+                                    styles.inputContainer,
+                                    focusedInput === 'location' && styles.inputContainerFocused
+                                ]}>
+                                    <LinearGradient
+                                        colors={['#ffffff', '#f8f9fb'] as [string, string]}
+                                        style={styles.inputGradient}
+                                    >
+                                        <Text style={styles.inputIcon}>📍</Text>
+                                        <TextInput
+                                            style={styles.textInput}
+                                            placeholder="Enter city, address, or zip code..."
+                                            value={location}
+                                            onChangeText={setLocation}
+                                            onFocus={() => setFocusedInput('location')}
+                                            onBlur={() => setFocusedInput(null)}
+                                            placeholderTextColor="#9ca3af"
+                                        />
+                                    </LinearGradient>
+                                </View>
+                            </View>
+
+                            <Pressable
+                                style={[
+                                    styles.searchButtonContainer,
+                                    (!searchQuery.trim() && !location.trim()) && styles.searchButtonDisabled
+                                ]}
+                                onPress={handleSearch}
+                                disabled={!searchQuery.trim() && !location.trim()}
+                            >
+                                <LinearGradient
+                                    colors={
+                                        (!searchQuery.trim() && !location.trim())
+                                            ? ['#9ca3af', '#6b7280'] as [string, string]
+                                            : ['#f093fb', '#f5576c'] as [string, string]
+                                    }
+                                    style={styles.searchButton}
                                 >
-                                    <ThemedText style={styles.popularTagText}>{tag}</ThemedText>
-                                </Pressable>
-                            ))}
+                                    <Text style={styles.searchButtonText}>
+                                        🔍 Search Restaurants
+                                    </Text>
+                                </LinearGradient>
+                            </Pressable>
                         </View>
-                    </ThemedView>
-                </ThemedView>
-            </ScrollView>
+
+                        {/* Search Tips */}
+                        <View style={styles.tipsCard}>
+                            <LinearGradient
+                                colors={['#ffffff', '#f8f9fb'] as [string, string]}
+                                style={styles.tipsGradient}
+                            >
+                                <View style={styles.tipsHeader}>
+                                    <Text style={styles.tipsIcon}>💡</Text>
+                                    <Text style={styles.tipsTitle}>Search Tips</Text>
+                                </View>
+                                <View style={styles.tipsList}>
+                                    <View style={styles.tipItem}>
+                                        <Text style={styles.tipBullet}>•</Text>
+                                        <Text style={styles.tipText}>
+                                            Enter just a restaurant name to search globally
+                                        </Text>
+                                    </View>
+                                    <View style={styles.tipItem}>
+                                        <Text style={styles.tipBullet}>•</Text>
+                                        <Text style={styles.tipText}>
+                                            Add location for local results
+                                        </Text>
+                                    </View>
+                                    <View style={styles.tipItem}>
+                                        <Text style={styles.tipBullet}>•</Text>
+                                        <Text style={styles.tipText}>
+                                            Try searching by cuisine type (e.g., "Italian", "Sushi")
+                                        </Text>
+                                    </View>
+                                </View>
+                            </LinearGradient>
+                        </View>
+
+                        {/* Popular Searches */}
+                        <View style={styles.popularSection}>
+                            <Text style={styles.sectionTitle}>Popular Searches</Text>
+                            <View style={styles.popularTags}>
+                                {['Pizza', 'Sushi', 'Burger', 'Thai', 'Mexican', 'Italian'].map((tag) => (
+                                    <Pressable
+                                        key={tag}
+                                        style={styles.popularTagContainer}
+                                        onPress={() => setSearchQuery(tag)}
+                                    >
+                                        <LinearGradient
+                                            colors={['#e0e7ff', '#c7d2fe'] as [string, string]}
+                                            style={styles.popularTag}
+                                        >
+                                            <Text style={styles.popularTagText}>{tag}</Text>
+                                        </LinearGradient>
+                                    </Pressable>
+                                ))}
+                            </View>
+                        </View>
+                    </View>
+                </ScrollView>
+            </LinearGradient>
         </SafeAreaView>
     );
 }
@@ -102,81 +173,187 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
     },
-    content: {
-        padding: 24,
+    backgroundGradient: {
+        flex: 1,
+    },
+    headerSection: {
+        alignItems: 'center',
+        paddingTop: 20,
+        paddingBottom: 30,
+        paddingHorizontal: 24,
+    },
+    headerIconContainer: {
+        width: 60,
+        height: 60,
+        borderRadius: 30,
+        backgroundColor: 'rgba(255, 255, 255, 0.2)',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginBottom: 16,
+    },
+    headerIcon: {
+        fontSize: 28,
+    },
+    headerTitle: {
+        fontSize: 28,
+        fontWeight: 'bold',
+        color: '#ffffff',
+        textAlign: 'center',
+        marginBottom: 8,
+    },
+    headerSubtitle: {
+        fontSize: 16,
+        color: 'rgba(255, 255, 255, 0.9)',
+        textAlign: 'center',
+    },
+    contentContainer: {
+        backgroundColor: '#f8f9fb',
+        borderTopLeftRadius: 30,
+        borderTopRightRadius: 30,
+        paddingTop: 30,
+        paddingHorizontal: 24,
+        paddingBottom: 40,
+        minHeight: 600,
     },
     searchForm: {
         marginBottom: 32,
     },
-    formTitle: {
-        marginBottom: 24,
-        textAlign: 'center',
-    },
     inputGroup: {
-        marginBottom: 20,
+        marginBottom: 24,
     },
     inputLabel: {
         fontSize: 16,
         fontWeight: '600',
+        color: '#374151',
         marginBottom: 8,
     },
-    textInput: {
-        borderWidth: 1,
-        borderColor: '#E5E5EA',
-        borderRadius: 12,
-        padding: 16,
-        fontSize: 16,
-        backgroundColor: '#F2F2F7',
+    inputContainer: {
+        borderRadius: 16,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.08,
+        shadowRadius: 8,
+        elevation: 6,
     },
-    searchButton: {
-        backgroundColor: '#007AFF',
-        padding: 16,
-        borderRadius: 12,
+    inputContainerFocused: {
+        shadowOpacity: 0.15,
+        shadowRadius: 12,
+        elevation: 10,
+    },
+    inputGradient: {
+        flexDirection: 'row',
         alignItems: 'center',
+        borderRadius: 16,
+        padding: 16,
+    },
+    inputIcon: {
+        fontSize: 20,
+        marginRight: 12,
+    },
+    textInput: {
+        flex: 1,
+        fontSize: 16,
+        color: '#374151',
+    },
+    searchButtonContainer: {
+        borderRadius: 16,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.15,
+        shadowRadius: 12,
+        elevation: 8,
         marginTop: 8,
     },
     searchButtonDisabled: {
-        backgroundColor: '#8E8E93',
-        opacity: 0.5,
+        shadowOpacity: 0.05,
+    },
+    searchButton: {
+        padding: 18,
+        borderRadius: 16,
+        alignItems: 'center',
     },
     searchButtonText: {
-        color: '#FFFFFF',
-        fontSize: 16,
-        fontWeight: '600',
+        color: '#ffffff',
+        fontSize: 18,
+        fontWeight: 'bold',
     },
-    tipsSection: {
+    tipsCard: {
         marginBottom: 32,
-        padding: 20,
-        backgroundColor: '#F2F2F7',
-        borderRadius: 12,
+        borderRadius: 20,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.08,
+        shadowRadius: 12,
+        elevation: 6,
+    },
+    tipsGradient: {
+        padding: 24,
+        borderRadius: 20,
+    },
+    tipsHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 16,
+    },
+    tipsIcon: {
+        fontSize: 24,
+        marginRight: 8,
     },
     tipsTitle: {
-        marginBottom: 12,
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#374151',
+    },
+    tipsList: {
+        gap: 8,
+    },
+    tipItem: {
+        flexDirection: 'row',
+        alignItems: 'flex-start',
+    },
+    tipBullet: {
+        fontSize: 16,
+        color: '#667eea',
+        fontWeight: 'bold',
+        marginRight: 8,
+        marginTop: 2,
     },
     tipText: {
-        fontSize: 14,
-        opacity: 0.8,
-        marginBottom: 6,
+        fontSize: 15,
+        color: '#6b7280',
+        lineHeight: 22,
+        flex: 1,
     },
     popularSection: {
         marginBottom: 32,
     },
-    popularTitle: {
+    sectionTitle: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: '#374151',
         marginBottom: 16,
     },
     popularTags: {
         flexDirection: 'row',
         flexWrap: 'wrap',
-        gap: 8,
+        gap: 12,
+    },
+    popularTagContainer: {
+        borderRadius: 25,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.08,
+        shadowRadius: 4,
+        elevation: 4,
     },
     popularTag: {
-        backgroundColor: '#E5E5EA',
-        paddingHorizontal: 16,
-        paddingVertical: 8,
-        borderRadius: 20,
+        paddingHorizontal: 20,
+        paddingVertical: 10,
+        borderRadius: 25,
     },
     popularTagText: {
         fontSize: 14,
-        color: '#007AFF',
+        fontWeight: '600',
+        color: '#667eea',
     },
 }); 

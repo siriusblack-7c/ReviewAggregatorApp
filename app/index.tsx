@@ -1,9 +1,8 @@
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
 import { useColorScheme } from '@/hooks/useColorScheme';
+import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import React from 'react';
-import { Dimensions, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Dimensions, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 const { width } = Dimensions.get('window');
@@ -13,25 +12,30 @@ interface NavigationCardProps {
     subtitle: string;
     icon: string;
     route: string;
-    color: string;
+    colors: [string, string];
     onPress: () => void;
 }
 
-function NavigationCard({ title, subtitle, icon, color, onPress }: NavigationCardProps) {
+function NavigationCard({ title, subtitle, icon, colors, onPress }: NavigationCardProps) {
     return (
-        <Pressable style={[styles.navigationCard, { borderLeftColor: color }]} onPress={onPress}>
-            <ThemedView style={styles.cardContent}>
-                <ThemedText style={[styles.cardIcon, { color }]}>{icon}</ThemedText>
-                <View style={styles.cardTextContainer}>
-                    <ThemedText type="defaultSemiBold" style={styles.cardTitle}>
-                        {title}
-                    </ThemedText>
-                    <ThemedText style={styles.cardSubtitle}>
-                        {subtitle}
-                    </ThemedText>
+        <Pressable style={styles.navigationCardContainer} onPress={onPress}>
+            <LinearGradient
+                colors={colors}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.navigationCard}
+            >
+                <View style={styles.cardIconContainer}>
+                    <Text style={styles.cardIcon}>{icon}</Text>
                 </View>
-                <ThemedText style={styles.cardArrow}>→</ThemedText>
-            </ThemedView>
+                <View style={styles.cardTextContainer}>
+                    <Text style={styles.cardTitle}>{title}</Text>
+                    <Text style={styles.cardSubtitle}>{subtitle}</Text>
+                </View>
+                <View style={styles.cardArrowContainer}>
+                    <Text style={styles.cardArrow}>→</Text>
+                </View>
+            </LinearGradient>
         </Pressable>
     );
 }
@@ -45,28 +49,28 @@ export default function HomePage() {
             subtitle: "Find reviews from all platforms",
             icon: "🔍",
             route: "/search",
-            color: "#007AFF"
+            colors: ['#667eea', '#764ba2'] as [string, string]
         },
         {
             title: "My Favorites",
             subtitle: "Your saved restaurants",
             icon: "⭐",
             route: "/favorites",
-            color: "#FF3B30"
+            colors: ['#f093fb', '#f5576c'] as [string, string]
         },
         {
             title: "Search History",
             subtitle: "Recent searches",
             icon: "📱",
             route: "/history",
-            color: "#34C759"
+            colors: ['#4facfe', '#00f2fe'] as [string, string]
         },
         {
             title: "About",
             subtitle: "App information",
             icon: "ℹ️",
             route: "/about",
-            color: "#8E8E93"
+            colors: ['#a8edea', '#fed6e3'] as [string, string]
         }
     ];
 
@@ -76,67 +80,79 @@ export default function HomePage() {
 
     return (
         <SafeAreaView style={styles.container}>
-            <ScrollView showsVerticalScrollIndicator={false}>
-                {/* Hero Section */}
-                <ThemedView style={styles.heroSection}>
-                    <ThemedText type="title" style={styles.heroTitle}>
-                        Review Aggregator
-                    </ThemedText>
-                    <ThemedText style={styles.heroSubtitle}>
-                        Find restaurant reviews from all platforms in one place
-                    </ThemedText>
-                </ThemedView>
-
-                {/* Quick Search Section */}
-                <ThemedView style={styles.quickSearchSection}>
-                    <ThemedText type="subtitle" style={styles.sectionTitle}>
-                        Quick Search
-                    </ThemedText>
-                    <Pressable
-                        style={styles.quickSearchBar}
-                        onPress={() => handleNavigation('/search')}
-                    >
-                        <ThemedText style={styles.quickSearchPlaceholder}>
-                            🔍 Search for restaurants...
-                        </ThemedText>
-                    </Pressable>
-                </ThemedView>
-
-                {/* Navigation Grid */}
-                <ThemedView style={styles.navigationSection}>
-                    <ThemedText type="subtitle" style={styles.sectionTitle}>
-                        Explore
-                    </ThemedText>
-                    <View style={styles.navigationGrid}>
-                        {navigationOptions.map((option, index) => (
-                            <NavigationCard
-                                key={index}
-                                title={option.title}
-                                subtitle={option.subtitle}
-                                icon={option.icon}
-                                route={option.route}
-                                color={option.color}
-                                onPress={() => handleNavigation(option.route)}
-                            />
-                        ))}
+            <LinearGradient
+                colors={['#667eea', '#764ba2']}
+                style={styles.backgroundGradient}
+            >
+                <ScrollView showsVerticalScrollIndicator={false}>
+                    {/* Hero Section */}
+                    <View style={styles.heroSection}>
+                        <View style={styles.heroIconContainer}>
+                            <Text style={styles.heroIcon}>🍽️</Text>
+                        </View>
+                        <Text style={styles.heroTitle}>Review Aggregator</Text>
+                        <Text style={styles.heroSubtitle}>
+                            Discover the best restaurants with reviews from every platform
+                        </Text>
                     </View>
-                </ThemedView>
 
-                {/* Recent Activity Section */}
-                <ThemedView style={styles.recentSection}>
-                    <ThemedText type="subtitle" style={styles.sectionTitle}>
-                        Recent Activity
-                    </ThemedText>
-                    <ThemedView style={styles.emptyState}>
-                        <ThemedText style={styles.emptyStateText}>
-                            No recent activity yet
-                        </ThemedText>
-                        <ThemedText style={styles.emptyStateSubtext}>
-                            Start searching for restaurants to see your activity here
-                        </ThemedText>
-                    </ThemedView>
-                </ThemedView>
-            </ScrollView>
+                    {/* Quick Search Section */}
+                    <View style={styles.contentContainer}>
+                        <View style={styles.quickSearchSection}>
+                            <Text style={styles.sectionTitle}>Quick Search</Text>
+                            <Pressable
+                                style={styles.quickSearchBar}
+                                onPress={() => handleNavigation('/search')}
+                            >
+                                <LinearGradient
+                                    colors={['#ffffff', '#f8f9fb']}
+                                    style={styles.quickSearchGradient}
+                                >
+                                    <Text style={styles.quickSearchIcon}>🔍</Text>
+                                    <Text style={styles.quickSearchPlaceholder}>
+                                        Search for restaurants...
+                                    </Text>
+                                </LinearGradient>
+                            </Pressable>
+                        </View>
+
+                        {/* Navigation Grid */}
+                        <View style={styles.navigationSection}>
+                            <Text style={styles.sectionTitle}>Explore</Text>
+                            <View style={styles.navigationGrid}>
+                                {navigationOptions.map((option, index) => (
+                                    <NavigationCard
+                                        key={index}
+                                        title={option.title}
+                                        subtitle={option.subtitle}
+                                        icon={option.icon}
+                                        route={option.route}
+                                        colors={option.colors}
+                                        onPress={() => handleNavigation(option.route)}
+                                    />
+                                ))}
+                            </View>
+                        </View>
+
+                        {/* Recent Activity Section */}
+                        <View style={styles.recentSection}>
+                            <Text style={styles.sectionTitle}>Recent Activity</Text>
+                            <View style={styles.emptyStateCard}>
+                                <LinearGradient
+                                    colors={['#ffffff', '#f8f9fb']}
+                                    style={styles.emptyStateGradient}
+                                >
+                                    <Text style={styles.emptyStateIcon}>📊</Text>
+                                    <Text style={styles.emptyStateText}>No recent activity yet</Text>
+                                    <Text style={styles.emptyStateSubtext}>
+                                        Start searching for restaurants to see your activity here
+                                    </Text>
+                                </LinearGradient>
+                            </View>
+                        </View>
+                    </View>
+                </ScrollView>
+            </LinearGradient>
         </SafeAreaView>
     );
 }
@@ -145,104 +161,176 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
     },
+    backgroundGradient: {
+        flex: 1,
+    },
     heroSection: {
-        padding: 24,
         alignItems: 'center',
-        paddingTop: 32,
+        paddingTop: 40,
+        paddingBottom: 30,
+        paddingHorizontal: 24,
+    },
+    heroIconContainer: {
+        width: 80,
+        height: 80,
+        borderRadius: 40,
+        backgroundColor: 'rgba(255, 255, 255, 0.2)',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginBottom: 20,
+    },
+    heroIcon: {
+        fontSize: 40,
     },
     heroTitle: {
+        fontSize: 32,
+        fontWeight: 'bold',
+        color: '#ffffff',
         textAlign: 'center',
-        marginBottom: 8,
+        marginBottom: 12,
+        textShadowColor: 'rgba(0, 0, 0, 0.3)',
+        textShadowOffset: { width: 0, height: 2 },
+        textShadowRadius: 4,
     },
     heroSubtitle: {
-        textAlign: 'center',
-        opacity: 0.7,
         fontSize: 16,
-        lineHeight: 22,
+        color: 'rgba(255, 255, 255, 0.9)',
+        textAlign: 'center',
+        lineHeight: 24,
+        paddingHorizontal: 20,
+    },
+    contentContainer: {
+        backgroundColor: '#f8f9fb',
+        borderTopLeftRadius: 30,
+        borderTopRightRadius: 30,
+        paddingTop: 30,
+        paddingHorizontal: 24,
+        paddingBottom: 40,
+        minHeight: 600,
     },
     quickSearchSection: {
-        padding: 24,
-        paddingTop: 16,
+        marginBottom: 32,
     },
     sectionTitle: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        color: '#2d3748',
         marginBottom: 16,
     },
     quickSearchBar: {
-        padding: 16,
-        backgroundColor: '#F2F2F7',
-        borderRadius: 12,
-        borderWidth: 1,
-        borderColor: '#E5E5EA',
-    },
-    quickSearchPlaceholder: {
-        color: '#8E8E93',
-        fontSize: 16,
-    },
-    navigationSection: {
-        padding: 24,
-        paddingTop: 8,
-    },
-    navigationGrid: {
-        gap: 12,
-    },
-    navigationCard: {
-        backgroundColor: '#FFFFFF',
-        borderRadius: 12,
-        borderLeftWidth: 4,
+        borderRadius: 16,
         shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 2,
-        },
+        shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.1,
-        shadowRadius: 3.84,
-        elevation: 5,
+        shadowRadius: 8,
+        elevation: 8,
     },
-    cardContent: {
+    quickSearchGradient: {
         flexDirection: 'row',
         alignItems: 'center',
-        padding: 16,
-        backgroundColor: 'transparent',
+        padding: 18,
+        borderRadius: 16,
+    },
+    quickSearchIcon: {
+        fontSize: 20,
+        marginRight: 12,
+    },
+    quickSearchPlaceholder: {
+        color: '#6b7280',
+        fontSize: 16,
+        flex: 1,
+    },
+    navigationSection: {
+        marginBottom: 32,
+    },
+    navigationGrid: {
+        gap: 16,
+    },
+    navigationCardContainer: {
+        borderRadius: 20,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 6 },
+        shadowOpacity: 0.15,
+        shadowRadius: 12,
+        elevation: 10,
+    },
+    navigationCard: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        padding: 20,
+        borderRadius: 20,
+        minHeight: 80,
+    },
+    cardIconContainer: {
+        width: 50,
+        height: 50,
+        borderRadius: 25,
+        backgroundColor: 'rgba(255, 255, 255, 0.3)',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginRight: 16,
     },
     cardIcon: {
         fontSize: 24,
-        marginRight: 16,
-        width: 32,
-        textAlign: 'center',
     },
     cardTextContainer: {
         flex: 1,
     },
     cardTitle: {
-        fontSize: 16,
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#ffffff',
         marginBottom: 4,
     },
     cardSubtitle: {
         fontSize: 14,
-        opacity: 0.7,
+        color: 'rgba(255, 255, 255, 0.8)',
+        lineHeight: 18,
+    },
+    cardArrowContainer: {
+        width: 30,
+        height: 30,
+        borderRadius: 15,
+        backgroundColor: 'rgba(255, 255, 255, 0.2)',
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     cardArrow: {
-        fontSize: 18,
-        opacity: 0.5,
+        fontSize: 16,
+        color: '#ffffff',
+        fontWeight: 'bold',
     },
     recentSection: {
-        padding: 24,
-        paddingTop: 8,
+        marginBottom: 32,
     },
-    emptyState: {
+    emptyStateCard: {
+        borderRadius: 16,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.08,
+        shadowRadius: 8,
+        elevation: 6,
+    },
+    emptyStateGradient: {
         alignItems: 'center',
         padding: 32,
-        backgroundColor: 'transparent',
+        borderRadius: 16,
+    },
+    emptyStateIcon: {
+        fontSize: 48,
+        marginBottom: 16,
     },
     emptyStateText: {
-        fontSize: 16,
-        opacity: 0.7,
+        fontSize: 18,
+        fontWeight: '600',
+        color: '#374151',
         textAlign: 'center',
         marginBottom: 8,
     },
     emptyStateSubtext: {
         fontSize: 14,
-        opacity: 0.5,
+        color: '#6b7280',
         textAlign: 'center',
+        lineHeight: 20,
     },
 }); 
