@@ -20,7 +20,41 @@ export default function RootLayout() {
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen
+          name="index"
+          options={{
+            headerShown: false,
+            title: 'Review Aggregator'
+          }}
+        />
+        <Stack.Screen
+          name="search/index"
+          options={{
+            title: 'Search Restaurants',
+            headerBackTitle: 'Home'
+          }}
+        />
+        <Stack.Screen
+          name="restaurant/[id]"
+          options={{
+            title: 'Restaurant Details',
+            headerBackTitle: 'Search'
+          }}
+        />
+        <Stack.Screen
+          name="favorites/index"
+          options={{
+            title: 'My Favorites',
+            headerBackTitle: 'Home'
+          }}
+        />
+        <Stack.Screen
+          name="history/index"
+          options={{
+            title: 'Search History',
+            headerBackTitle: 'Home'
+          }}
+        />
         <Stack.Screen name="+not-found" />
       </Stack>
       <StatusBar style="auto" />
