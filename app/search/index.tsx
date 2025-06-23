@@ -12,7 +12,9 @@ export default function SearchScreen() {
     const handleSearch = () => {
         if (searchQuery.trim() || location.trim()) {
             // Navigate to results with search parameters
-            router.push(`/search/results?query=${searchQuery}&location=${location}`);
+            const query = encodeURIComponent(searchQuery);
+            const loc = encodeURIComponent(location);
+            router.push(`/search/results?query=${query}&location=${loc}`);
         }
     };
 
