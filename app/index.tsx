@@ -1,7 +1,9 @@
 import { useColorScheme } from '@/hooks/useColorScheme';
+import { favoriteService, SearchHistoryItem } from '@/services/favoriteService';
+import { useFocusEffect } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
-import React from 'react';
+import React, { useCallback, useState } from 'react';
 import { Dimensions, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -42,6 +44,33 @@ function NavigationCard({ title, subtitle, icon, colors, onPress }: NavigationCa
 
 export default function HomePage() {
     const colorScheme = useColorScheme();
+    const [recentActivity, setRecentActivity] = useState<SearchHistoryItem[]>([]);
+    const [activityLoading, setActivityLoading] = useState(true);
+
+    // Load recent activity when screen comes into focus
+    useFocusEffect(
+        useCallback(() => {
+            loadRecentActivity();
+        }, [])
+    );
+
+    const loadRecentActivity = async () => {
+        try {
+            const history = await favoriteService.getSearchHistory();
+            // Show only the 3 most recent searches
+            setRecentActivity(history.slice(0, 3));
+        } catch (error) {
+            console.error('Error loading recent activity:', error);
+        } finally {
+            setActivityLoading(false);
+        }
+    };
+
+    const handleRecentActivityPress = (item: SearchHistoryItem) => {
+        const query = encodeURIComponent(item.query);
+        const location = encodeURIComponent(item.location);
+        router.push(`/search/results?query=${query}&location=${location}`);
+    };
 
     const navigationOptions = [
         {
@@ -137,18 +166,76 @@ export default function HomePage() {
                         {/* Recent Activity Section */}
                         <View style={styles.recentSection}>
                             <Text style={styles.sectionTitle}>Recent Activity</Text>
-                            <View style={styles.emptyStateCard}>
-                                <LinearGradient
-                                    colors={['#ffffff', '#f8f9fb']}
-                                    style={styles.emptyStateGradient}
-                                >
-                                    <Text style={styles.emptyStateIcon}>📊</Text>
-                                    <Text style={styles.emptyStateText}>No recent activity yet</Text>
-                                    <Text style={styles.emptyStateSubtext}>
-                                        Start searching for restaurants to see your activity here
-                                    </Text>
-                                </LinearGradient>
-                            </View>
+                            {activityLoading ? (
+                                <View style={styles.emptyStateCard}>
+                                    <LinearGradient
+                                        colors={['#ffffff', '#f8f9fb']}
+                                        style={styles.emptyStateGradient}
+                                    >
+                                        <Text style={styles.emptyStateIcon}>⏳</Text>
+                                        <Text style={styles.emptyStateText}>Loading recent activity...</Text>
+                                    </LinearGradient>
+                                </View>
+                            ) : recentActivity.length === 0 ? (
+                                <View style={styles.emptyStateCard}>
+                                    <LinearGradient
+                                        colors={['#ffffff', '#f8f9fb']}
+                                        style={styles.emptyStateGradient}
+                                    >
+                                        <Text style={styles.emptyStateIcon}>📊</Text>
+                                        <Text style={styles.emptyStateText}>No recent activity yet</Text>
+                                        <Text style={styles.emptyStateSubtext}>
+                                            Start searching for restaurants to see your activity here
+                                        </Text>
+                                    </LinearGradient>
+                                </View>
+                            ) : (
+                                <View style={styles.recentActivityList}>
+                                    {recentActivity.map((item) => (
+                                        <Pressable
+                                            key={item.id}
+                                            style={styles.recentActivityItem}
+                                            onPress={() => handleRecentActivityPress(item)}
+                                        >
+                                            <LinearGradient
+                                                colors={['#ffffff', '#f8f9fb']}
+                                                style={styles.recentActivityGradient}
+                                            >
+                                                <View style={styles.recentActivityIcon}>
+                                                    <Text style={styles.recentActivityIconText}>🔍</Text>
+                                                </View>
+                                                <View style={styles.recentActivityContent}>
+                                                    <Text style={styles.recentActivityQuery} numberOfLines={1}>
+                                                        {item.query || 'Restaurant search'}
+                                                    </Text>
+                                                    <Text style={styles.recentActivityLocation} numberOfLines={1}>
+                                                        {item.location || 'All locations'}
+                                                    </Text>
+                                                    <Text style={styles.recentActivityTime}>
+                                                        {new Date(item.timestamp).toLocaleDateString()} • {item.resultCount} results
+                                                    </Text>
+                                                </View>
+                                                <View style={styles.recentActivityArrow}>
+                                                    <Text style={styles.recentActivityArrowText}>→</Text>
+                                                </View>
+                                            </LinearGradient>
+                                        </Pressable>
+                                    ))}
+
+                                    {/* View All Button */}
+                                    <Pressable
+                                        style={styles.viewAllActivityButton}
+                                        onPress={() => handleNavigation('/history')}
+                                    >
+                                        <LinearGradient
+                                            colors={['#4facfe', '#00f2fe']}
+                                            style={styles.viewAllActivityGradient}
+                                        >
+                                            <Text style={styles.viewAllActivityText}>View All History</Text>
+                                        </LinearGradient>
+                                    </Pressable>
+                                </View>
+                            )}
                         </View>
                     </View>
                 </ScrollView>
@@ -332,5 +419,89 @@ const styles = StyleSheet.create({
         color: '#6b7280',
         textAlign: 'center',
         lineHeight: 20,
+    },
+    recentActivityList: {
+        gap: 16,
+    },
+    recentActivityItem: {
+        borderRadius: 20,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 6 },
+        shadowOpacity: 0.15,
+        shadowRadius: 12,
+        elevation: 10,
+    },
+    recentActivityGradient: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        padding: 20,
+        borderRadius: 20,
+        minHeight: 80,
+    },
+    recentActivityIcon: {
+        width: 50,
+        height: 50,
+        borderRadius: 25,
+        backgroundColor: 'rgba(79, 172, 254, 0.1)',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginRight: 16,
+    },
+    recentActivityIconText: {
+        fontSize: 20,
+    },
+    recentActivityContent: {
+        flex: 1,
+    },
+    recentActivityQuery: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#374151',
+        marginBottom: 4,
+    },
+    recentActivityLocation: {
+        fontSize: 14,
+        color: '#6b7280',
+        lineHeight: 18,
+    },
+    recentActivityTime: {
+        fontSize: 12,
+        color: '#9ca3af',
+        lineHeight: 16,
+        marginTop: 2,
+    },
+    recentActivityArrow: {
+        width: 30,
+        height: 30,
+        borderRadius: 15,
+        backgroundColor: 'rgba(79, 172, 254, 0.1)',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    recentActivityArrowText: {
+        fontSize: 16,
+        color: '#4facfe',
+        fontWeight: 'bold',
+    },
+    viewAllActivityButton: {
+        borderRadius: 16,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.1,
+        shadowRadius: 8,
+        elevation: 8,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    viewAllActivityGradient: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        padding: 18,
+        borderRadius: 16,
+    },
+    viewAllActivityText: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#ffffff',
     },
 }); 

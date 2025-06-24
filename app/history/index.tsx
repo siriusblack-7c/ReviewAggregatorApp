@@ -1,12 +1,11 @@
+import { LoadingState } from '@/components/common/LoadingState';
+import { favoriteService, SearchHistoryItem } from '@/services/favoriteService';
+import { useFocusEffect } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { router } from 'expo-router';
 import React, { useCallback, useState } from 'react';
 import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { favoriteService } from '@/services/favoriteService';
-import { SearchHistoryItem } from '@/services/favoriteService';
-import { useFocusEffect } from '@react-navigation/native';
-import { LoadingState } from '@/components/common/LoadingState';
-import { router } from 'expo-router';
 
 export default function HistoryScreen() {
     const [searchHistory, setSearchHistory] = useState<SearchHistoryItem[]>([]);
@@ -114,7 +113,7 @@ export default function HistoryScreen() {
                                 {/* Info Section */}
                                 <View style={styles.infoCard}>
                                     <LinearGradient
-                                        colors={['#ffffff', '#f8f9fb'] as [string, string]}
+                                        colors={['#ffffff', '#f3f2f5'] as [string, string]}
                                         style={styles.infoGradient}
                                     >
                                         <View style={styles.infoHeader}>
@@ -174,35 +173,51 @@ export default function HistoryScreen() {
                         ) : (
                             <View style={styles.historyList}>
                                 {searchHistory.map((item, index) => (
-                                    <View key={item.id} style={styles.historyItem}>
-                                        <View style={styles.historyItemView}>
-                                            <Text style={styles.historyItemTextNumber}>
-                                                {index + 1}.
-                                            </Text>
-                                            <Text style={styles.historyItemText}>
-                                                {item.query}
-                                            </Text>
-                                            <Text style={styles.historyItemText}>
-                                                {item.location}
-                                            </Text>
-                                            <Text style={styles.historyItemText}>
-                                                {new Date(item.timestamp).toLocaleString()}
-                                            </Text>
-                                        </View>
-                                        <View style={styles.historyItemView}>
-                                            <Text style={styles.historyItemResultNumber}>
-                                                {item.resultCount} results
-                                            </Text>
+                                    <Pressable key={item.id} style={styles.historyItem} onPress={() => handleSearchAgain(item)}>
+                                        <LinearGradient
+                                            colors={['#ffffff', '#f8f9fb']}
+                                            style={styles.historyItemGradient}
+                                        >
+                                            <View style={styles.historyItemHeader}>
+                                                <View style={styles.historyNumber}>
+                                                    <Text style={styles.historyItemTextNumber}>
+                                                        {index + 1}
+                                                    </Text>
+                                                </View>
+                                                <View style={styles.historyItemContent}>
+                                                    <Text style={styles.historyItemQuery} numberOfLines={1}>
+                                                        {item.query}
+                                                    </Text>
+                                                    <Text style={styles.historyItemLocation} numberOfLines={1}>
+                                                        📍 {item.location}
+                                                    </Text>
+                                                    <Text style={styles.historyItemTime}>
+                                                        {new Date(item.timestamp).toLocaleDateString()} • {item.resultCount} results
+                                                    </Text>
+                                                </View>
+                                            </View>
                                             <View style={styles.historyButtons}>
-                                                <Pressable style={styles.historyAction} onPress={() => handleSearchAgain(item)}>
+                                                <Pressable
+                                                    style={styles.historyAction}
+                                                    onPress={(e) => {
+                                                        e.stopPropagation();
+                                                        handleSearchAgain(item);
+                                                    }}
+                                                >
                                                     <Text style={styles.historyActionText}>Search Again</Text>
                                                 </Pressable>
-                                                <Pressable style={styles.historyAction} onPress={() => handleRemoveItem(item.id)}>
+                                                <Pressable
+                                                    style={[styles.historyAction, styles.removeAction]}
+                                                    onPress={(e) => {
+                                                        e.stopPropagation();
+                                                        handleRemoveItem(item.id);
+                                                    }}
+                                                >
                                                     <Text style={styles.historyActionText}>Remove</Text>
                                                 </Pressable>
                                             </View>
-                                        </View>
-                                    </View>
+                                        </LinearGradient>
+                                    </Pressable>
                                 ))}
                             </View>
                         )}
@@ -267,6 +282,8 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.1,
         shadowRadius: 12,
         elevation: 8,
+        width: '100%',
+        alignSelf: 'stretch',
     },
     emptyStateGradient: {
         alignItems: 'center',
@@ -307,6 +324,8 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.08,
         shadowRadius: 8,
         elevation: 6,
+        width: '100%',
+        alignSelf: 'stretch',
     },
     infoGradient: {
         padding: 24,
@@ -353,6 +372,8 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.08,
         shadowRadius: 8,
         elevation: 6,
+        width: '100%',
+        alignSelf: 'stretch',
     },
     tipsGradient: {
         padding: 24,
@@ -394,67 +415,79 @@ const styles = StyleSheet.create({
     emptyStateContainer: {
         flex: 1,
         justifyContent: 'center',
-        alignItems: 'center',
+        alignItems: 'stretch',
+        width: '100%',
+        paddingHorizontal: 0,
     },
     historyList: {
         gap: 16,
     },
     historyItem: {
-        flexDirection: 'column',
-        alignItems: 'center',
-        padding: 16,
-        backgroundColor: '#ffffff',
-        borderRadius: 12,
+        borderRadius: 20,
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
+        shadowOffset: { width: 0, height: 6 },
         shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 3,
-        width: '100%',
+        shadowRadius: 12,
+        elevation: 8,
+        marginBottom: 16,
     },
-    historyItemView: {
+    historyItemGradient: {
+        padding: 20,
+        borderRadius: 20,
+    },
+    historyItemHeader: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
         alignItems: 'center',
-        width: '100%',
-        gap: '10px',
-
+        marginBottom: 16,
+    },
+    historyNumber: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        backgroundColor: 'rgba(79, 172, 254, 0.1)',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginRight: 16,
     },
     historyItemTextNumber: {
         fontSize: 16,
-        color: 'white',
+        color: '#4facfe',
         fontWeight: 'bold',
-        display: 'flex',
-        textAlign: 'center',
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#007bff',
-        borderRadius: 30,
-        padding: 5,
-
     },
-    historyItemText: {
-        fontSize: 16,
+    historyItemContent: {
+        flex: 1,
+    },
+    historyItemQuery: {
+        fontSize: 18,
+        fontWeight: 'bold',
         color: '#374151',
+        marginBottom: 4,
+    },
+    historyItemLocation: {
+        fontSize: 14,
+        color: '#6b7280',
+        marginBottom: 4,
+    },
+    historyItemTime: {
+        fontSize: 12,
+        color: '#9ca3af',
     },
     historyButtons: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
+        gap: 8,
     },
     historyAction: {
-        padding: 8,
-        backgroundColor: '#007bff',
+        paddingHorizontal: 12,
+        paddingVertical: 8,
+        backgroundColor: '#4facfe',
         borderRadius: 8,
-        marginLeft: 16,
+    },
+    removeAction: {
+        backgroundColor: '#ef4444',
     },
     historyActionText: {
         color: '#ffffff',
         fontSize: 14,
         fontWeight: 'bold',
-    },
-    historyItemResultNumber: {
-        fontSize: 16,
-        color: '#374151',
     }
 }); 
