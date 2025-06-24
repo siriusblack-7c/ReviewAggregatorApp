@@ -1,3 +1,4 @@
+import { useTheme } from '@/contexts/ThemeContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useEffect, useRef } from 'react';
 import { Animated, StyleSheet, Text, View } from 'react-native';
@@ -8,6 +9,7 @@ interface LoadingStateProps {
 }
 
 export function LoadingState({ message = 'Loading...' }: LoadingStateProps) {
+    const { theme } = useTheme();
     const pulseAnim = useRef(new Animated.Value(0)).current;
     const rotateAnim = useRef(new Animated.Value(0)).current;
 
@@ -57,14 +59,14 @@ export function LoadingState({ message = 'Loading...' }: LoadingStateProps) {
     });
 
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
             <LinearGradient
-                colors={['#667eea', '#764ba2'] as [string, string]}
+                colors={theme.gradientPrimary}
                 style={styles.backgroundGradient}
             >
                 <View style={styles.contentContainer}>
                     <LinearGradient
-                        colors={['#ffffff', '#f8f9fb'] as [string, string]}
+                        colors={[theme.cardBackground, theme.surface]}
                         style={styles.loadingCard}
                     >
                         <View style={styles.animationContainer}>
@@ -95,8 +97,8 @@ export function LoadingState({ message = 'Loading...' }: LoadingStateProps) {
                             </Animated.View>
                         </View>
 
-                        <Text style={styles.loadingTitle}>{message}</Text>
-                        <Text style={styles.loadingSubtitle}>
+                        <Text style={[styles.loadingTitle, { color: theme.text }]}>{message}</Text>
+                        <Text style={[styles.loadingSubtitle, { color: theme.textSecondary }]}>
                             Please wait while we find the best restaurants for you
                         </Text>
 

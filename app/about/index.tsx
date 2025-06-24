@@ -1,3 +1,4 @@
+import { useTheme } from '@/contexts/ThemeContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import React from 'react';
@@ -5,6 +6,8 @@ import { Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-na
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function AboutScreen() {
+    const { theme } = useTheme();
+
     const handleContactPress = () => {
         Linking.openURL('mailto:support@reviewaggregator.com');
     };
@@ -24,9 +27,9 @@ export default function AboutScreen() {
     };
 
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
             <LinearGradient
-                colors={['#667eea', '#764ba2'] as [string, string]}
+                colors={theme.gradientPrimary}
                 style={styles.backgroundGradient}
             >
                 <ScrollView showsVerticalScrollIndicator={false}>
@@ -34,31 +37,31 @@ export default function AboutScreen() {
                     <View style={styles.headerSection}>
                         <View style={styles.appIconContainer}>
                             <LinearGradient
-                                colors={['#ffffff', '#f8f9fb'] as [string, string]}
+                                colors={[theme.cardBackground, theme.surface]}
                                 style={styles.appIconGradient}
                             >
-                                <Text style={styles.appIcon}>🍽️</Text>
+                                <Text style={[styles.appIcon, { color: theme.primary }]}>🍽️</Text>
                             </LinearGradient>
                         </View>
-                        <Text style={styles.appTitle}>Review Aggregator</Text>
-                        <Text style={styles.appSubtitle}>
+                        <Text style={[styles.appTitle, { color: theme.textInverse }]}>Review Aggregator</Text>
+                        <Text style={[styles.appSubtitle, { color: 'rgba(255, 255, 255, 0.9)' }]}>
                             Your Ultimate Restaurant Discovery App
                         </Text>
-                        <View style={styles.versionBadge}>
-                            <Text style={styles.versionText}>Version 1.0.0</Text>
+                        <View style={[styles.versionBadge, { backgroundColor: 'rgba(255, 255, 255, 0.2)' }]}>
+                            <Text style={[styles.versionText, { color: theme.textInverse }]}>Version 1.0.0</Text>
                         </View>
                     </View>
 
                     {/* Content Container */}
-                    <View style={styles.contentContainer}>
+                    <View style={[styles.contentContainer, { backgroundColor: theme.backgroundSecondary }]}>
                         {/* App Description */}
                         <View style={styles.descriptionCard}>
                             <LinearGradient
-                                colors={['#ffffff', '#f8f9fb'] as [string, string]}
+                                colors={[theme.cardBackground, theme.surface]}
                                 style={styles.descriptionGradient}
                             >
-                                <Text style={styles.descriptionTitle}>📱 About This App</Text>
-                                <Text style={styles.descriptionText}>
+                                <Text style={[styles.descriptionTitle, { color: theme.text }]}>📱 About This App</Text>
+                                <Text style={[styles.descriptionText, { color: theme.textSecondary }]}>
                                     Review Aggregator brings together restaurant reviews from multiple platforms
                                     including Google, Yelp, TripAdvisor, and OpenTable. Discover the best dining
                                     experiences with comprehensive reviews, ratings, and detailed restaurant
@@ -70,34 +73,34 @@ export default function AboutScreen() {
                         {/* Features Section */}
                         <View style={styles.featuresCard}>
                             <LinearGradient
-                                colors={['#ffffff', '#f8f9fb'] as [string, string]}
+                                colors={[theme.cardBackground, theme.surface]}
                                 style={styles.featuresGradient}
                             >
-                                <Text style={styles.featuresTitle}>✨ Key Features</Text>
+                                <Text style={[styles.featuresTitle, { color: theme.text }]}>✨ Key Features</Text>
                                 <View style={styles.featuresList}>
                                     <View style={styles.featureItem}>
-                                        <Text style={styles.featureIcon}>🔍</Text>
-                                        <Text style={styles.featureText}>Smart Restaurant Search</Text>
+                                        <Text style={[styles.featureIcon, { color: theme.primary }]}>🔍</Text>
+                                        <Text style={[styles.featureText, { color: theme.textSecondary }]}>Smart Restaurant Search</Text>
                                     </View>
                                     <View style={styles.featureItem}>
-                                        <Text style={styles.featureIcon}>⭐</Text>
-                                        <Text style={styles.featureText}>Multi-Platform Review Aggregation</Text>
+                                        <Text style={[styles.featureIcon, { color: theme.primary }]}>⭐</Text>
+                                        <Text style={[styles.featureText, { color: theme.textSecondary }]}>Multi-Platform Review Aggregation</Text>
                                     </View>
                                     <View style={styles.featureItem}>
-                                        <Text style={styles.featureIcon}>💖</Text>
-                                        <Text style={styles.featureText}>Personal Favorites Collection</Text>
+                                        <Text style={[styles.featureIcon, { color: theme.primary }]}>💖</Text>
+                                        <Text style={[styles.featureText, { color: theme.textSecondary }]}>Personal Favorites Collection</Text>
                                     </View>
                                     <View style={styles.featureItem}>
-                                        <Text style={styles.featureIcon}>📱</Text>
-                                        <Text style={styles.featureText}>Search History Tracking</Text>
+                                        <Text style={[styles.featureIcon, { color: theme.primary }]}>📱</Text>
+                                        <Text style={[styles.featureText, { color: theme.textSecondary }]}>Search History Tracking</Text>
                                     </View>
                                     <View style={styles.featureItem}>
-                                        <Text style={styles.featureIcon}>🎯</Text>
-                                        <Text style={styles.featureText}>Advanced Filtering Options</Text>
+                                        <Text style={[styles.featureIcon, { color: theme.primary }]}>🎯</Text>
+                                        <Text style={[styles.featureText, { color: theme.textSecondary }]}>Advanced Filtering Options</Text>
                                     </View>
                                     <View style={styles.featureItem}>
-                                        <Text style={styles.featureIcon}>📍</Text>
-                                        <Text style={styles.featureText}>Location-Based Discovery</Text>
+                                        <Text style={[styles.featureIcon, { color: theme.primary }]}>📍</Text>
+                                        <Text style={[styles.featureText, { color: theme.textSecondary }]}>Location-Based Discovery</Text>
                                     </View>
                                 </View>
                             </LinearGradient>
@@ -106,26 +109,26 @@ export default function AboutScreen() {
                         {/* Tech Stack */}
                         <View style={styles.techCard}>
                             <LinearGradient
-                                colors={['#ffffff', '#f8f9fb'] as [string, string]}
+                                colors={[theme.cardBackground, theme.surface]}
                                 style={styles.techGradient}
                             >
-                                <Text style={styles.techTitle}>🛠️ Built With</Text>
+                                <Text style={[styles.techTitle, { color: theme.text }]}>🛠️ Built With</Text>
                                 <View style={styles.techList}>
                                     <View style={styles.techItem}>
-                                        <Text style={styles.techIcon}>⚛️</Text>
-                                        <Text style={styles.techText}>React Native & Expo</Text>
+                                        <Text style={[styles.techIcon, { color: theme.accent }]}>⚛️</Text>
+                                        <Text style={[styles.techText, { color: theme.textSecondary }]}>React Native & Expo</Text>
                                     </View>
                                     <View style={styles.techItem}>
-                                        <Text style={styles.techIcon}>📘</Text>
-                                        <Text style={styles.techText}>TypeScript</Text>
+                                        <Text style={[styles.techIcon, { color: theme.accent }]}>📘</Text>
+                                        <Text style={[styles.techText, { color: theme.textSecondary }]}>TypeScript</Text>
                                     </View>
                                     <View style={styles.techItem}>
-                                        <Text style={styles.techIcon}>🎨</Text>
-                                        <Text style={styles.techText}>Beautiful Gradients & Animations</Text>
+                                        <Text style={[styles.techIcon, { color: theme.accent }]}>🎨</Text>
+                                        <Text style={[styles.techText, { color: theme.textSecondary }]}>Beautiful Gradients & Animations</Text>
                                     </View>
                                     <View style={styles.techItem}>
-                                        <Text style={styles.techIcon}>💾</Text>
-                                        <Text style={styles.techText}>AsyncStorage for Data Persistence</Text>
+                                        <Text style={[styles.techIcon, { color: theme.accent }]}>💾</Text>
+                                        <Text style={[styles.techText, { color: theme.textSecondary }]}>AsyncStorage for Data Persistence</Text>
                                     </View>
                                 </View>
                             </LinearGradient>
@@ -134,26 +137,26 @@ export default function AboutScreen() {
                         {/* Contact & Links */}
                         <View style={styles.contactCard}>
                             <LinearGradient
-                                colors={['#ffffff', '#f8f9fb'] as [string, string]}
+                                colors={[theme.cardBackground, theme.surface]}
                                 style={styles.contactGradient}
                             >
-                                <Text style={styles.contactTitle}>📞 Get In Touch</Text>
+                                <Text style={[styles.contactTitle, { color: theme.text }]}>📞 Get In Touch</Text>
 
                                 <Pressable style={styles.contactButton} onPress={handleContactPress}>
                                     <LinearGradient
-                                        colors={['#22c55e', '#16a34a'] as [string, string]}
+                                        colors={theme.gradientSecondary}
                                         style={styles.contactButtonGradient}
                                     >
-                                        <Text style={styles.contactButtonText}>📧 Contact Support</Text>
+                                        <Text style={[styles.contactButtonText, { color: theme.textInverse }]}>📧 Contact Support</Text>
                                     </LinearGradient>
                                 </Pressable>
 
                                 <Pressable style={styles.contactButton} onPress={handleWebsitePress}>
                                     <LinearGradient
-                                        colors={['#3b82f6', '#1d4ed8'] as [string, string]}
+                                        colors={theme.gradientPrimary}
                                         style={styles.contactButtonGradient}
                                     >
-                                        <Text style={styles.contactButtonText}>🌐 Visit Website</Text>
+                                        <Text style={[styles.contactButtonText, { color: theme.textInverse }]}>🌐 Visit Website</Text>
                                     </LinearGradient>
                                 </Pressable>
                             </LinearGradient>
@@ -162,20 +165,20 @@ export default function AboutScreen() {
                         {/* Legal & Policies */}
                         <View style={styles.legalCard}>
                             <LinearGradient
-                                colors={['#ffffff', '#f8f9fb'] as [string, string]}
+                                colors={[theme.cardBackground, theme.surface]}
                                 style={styles.legalGradient}
                             >
-                                <Text style={styles.legalTitle}>⚖️ Legal Information</Text>
+                                <Text style={[styles.legalTitle, { color: theme.text }]}>⚖️ Legal Information</Text>
 
-                                <Pressable style={styles.legalButton} onPress={handlePrivacyPress}>
-                                    <Text style={styles.legalButtonText}>🔒 Privacy Policy</Text>
+                                <Pressable style={[styles.legalButton, { borderBottomColor: theme.border }]} onPress={handlePrivacyPress}>
+                                    <Text style={[styles.legalButtonText, { color: theme.primary }]}>🔒 Privacy Policy</Text>
                                 </Pressable>
 
-                                <Pressable style={styles.legalButton} onPress={handleTermsPress}>
-                                    <Text style={styles.legalButtonText}>📋 Terms of Service</Text>
+                                <Pressable style={[styles.legalButton, { borderBottomColor: theme.border }]} onPress={handleTermsPress}>
+                                    <Text style={[styles.legalButtonText, { color: theme.primary }]}>📋 Terms of Service</Text>
                                 </Pressable>
 
-                                <Text style={styles.copyrightText}>
+                                <Text style={[styles.copyrightText, { color: theme.textTertiary }]}>
                                     © 2024 Review Aggregator. All rights reserved.
                                 </Text>
                             </LinearGradient>
@@ -184,14 +187,14 @@ export default function AboutScreen() {
                         {/* Developer Credits */}
                         <View style={styles.creditsCard}>
                             <LinearGradient
-                                colors={['#f093fb', '#f5576c'] as [string, string]}
+                                colors={theme.gradientAccent}
                                 style={styles.creditsGradient}
                             >
-                                <Text style={styles.creditsTitle}>👨‍💻 Developed by</Text>
-                                <Text style={styles.creditsText}>
+                                <Text style={[styles.creditsTitle, { color: theme.textInverse }]}>👨‍💻 Developed by</Text>
+                                <Text style={[styles.creditsText, { color: 'rgba(255, 255, 255, 0.9)' }]}>
                                     Built with ❤️ for food lovers everywhere
                                 </Text>
-                                <Text style={styles.creditsSubtext}>
+                                <Text style={[styles.creditsSubtext, { color: 'rgba(255, 255, 255, 0.8)' }]}>
                                     Connecting diners with the best restaurant experiences
                                 </Text>
                             </LinearGradient>
@@ -200,10 +203,10 @@ export default function AboutScreen() {
                         {/* Back Button */}
                         <Pressable style={styles.backButton} onPress={() => router.back()}>
                             <LinearGradient
-                                colors={['#667eea', '#764ba2'] as [string, string]}
+                                colors={theme.gradientSecondary}
                                 style={styles.backButtonGradient}
                             >
-                                <Text style={styles.backButtonText}>← Back to App</Text>
+                                <Text style={[styles.backButtonText, { color: theme.textInverse }]}>← Back to App</Text>
                             </LinearGradient>
                         </Pressable>
                     </View>

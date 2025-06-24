@@ -1,5 +1,6 @@
 import { LoadingState } from '@/components/common/LoadingState';
 import { RestaurantCard } from '@/components/restaurant/RestaurantCard';
+import { useTheme } from '@/contexts/ThemeContext';
 import { favoriteService } from '@/services/favoriteService';
 import { Restaurant } from '@/types';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -9,6 +10,7 @@ import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'r
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function FavoritesScreen() {
+    const { theme } = useTheme();
     const [favorites, setFavorites] = useState<Restaurant[]>([]);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
@@ -56,9 +58,9 @@ export default function FavoritesScreen() {
     }
 
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
             <LinearGradient
-                colors={['#f093fb', '#f5576c'] as [string, string]}
+                colors={theme.gradientSecondary}
                 style={styles.backgroundGradient}
             >
                 <ScrollView
@@ -82,18 +84,18 @@ export default function FavoritesScreen() {
                     </View>
 
                     {/* Content Container */}
-                    <View style={styles.contentContainer}>
+                    <View style={[styles.contentContainer, { backgroundColor: theme.backgroundSecondary }]}>
                         {favorites.length === 0 ? (
                             <>
                                 {/* Empty State */}
                                 <View style={styles.emptyStateCard}>
                                     <LinearGradient
-                                        colors={['#ffffff', '#f8f9fb'] as [string, string]}
+                                        colors={[theme.cardBackground, theme.surface]}
                                         style={styles.emptyStateGradient}
                                     >
                                         <Text style={styles.emptyStateIcon}>💖</Text>
-                                        <Text style={styles.emptyStateTitle}>No Favorites Yet</Text>
-                                        <Text style={styles.emptyStateText}>
+                                        <Text style={[styles.emptyStateTitle, { color: theme.text }]}>No Favorites Yet</Text>
+                                        <Text style={[styles.emptyStateText, { color: theme.textSecondary }]}>
                                             Start exploring restaurants and save your favorites here.
                                             Tap the heart icon on any restaurant to add it to your collection!
                                         </Text>

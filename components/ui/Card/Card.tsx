@@ -1,5 +1,6 @@
-import { ThemedView } from '@/components/ThemedView';
 import React from 'react';
+import { ThemedView } from '@/components/ThemedView';
+import { useTheme } from '@/contexts/ThemeContext';
 import { StyleSheet, ViewStyle } from 'react-native';
 
 interface CardProps {
@@ -19,9 +20,11 @@ export function Card({
     shadow = true,
     borderRadius = 12
 }: CardProps) {
+    const { theme } = useTheme();
+
     const cardStyle = [
-        styles.card,
         {
+            backgroundColor: theme.cardBackground,
             padding,
             margin,
             borderRadius,

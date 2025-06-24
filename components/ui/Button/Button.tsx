@@ -1,4 +1,5 @@
 import { ThemedText } from '@/components/ThemedText';
+import { useTheme } from '@/contexts/ThemeContext';
 import React from 'react';
 import { Pressable, StyleSheet, TextStyle, ViewStyle } from 'react-native';
 
@@ -23,18 +24,24 @@ export function Button({
     textStyle,
     icon
 }: ButtonProps) {
+    const { theme } = useTheme();
+
     const getButtonStyle = () => {
         const baseStyle = [styles.button, styles[size]];
 
         switch (variant) {
             case 'primary':
-                baseStyle.push(styles.primary);
+                baseStyle.push({ backgroundColor: theme.primary });
                 break;
             case 'secondary':
-                baseStyle.push(styles.secondary);
+                baseStyle.push({ backgroundColor: theme.surface });
                 break;
             case 'outline':
-                baseStyle.push(styles.outline);
+                baseStyle.push({
+                    backgroundColor: 'transparent',
+                    borderWidth: 1,
+                    borderColor: theme.primary
+                });
                 break;
         }
 
@@ -50,13 +57,13 @@ export function Button({
 
         switch (variant) {
             case 'primary':
-                baseStyle.push(styles.primaryText);
+                baseStyle.push({ color: theme.textInverse });
                 break;
             case 'secondary':
-                baseStyle.push(styles.secondaryText);
+                baseStyle.push({ color: theme.text });
                 break;
             case 'outline':
-                baseStyle.push(styles.outlineText);
+                baseStyle.push({ color: theme.primary });
                 break;
         }
 

@@ -1,4 +1,6 @@
 import { LoadingState } from '@/components/common/LoadingState';
+import { useTheme } from '@/contexts/ThemeContext';
+import { favoriteService } from '@/services/favoriteService';
 import { getRestaurantById, getRestaurantReviews } from '@/services/mockData';
 import { Restaurant, Review } from '@/types';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -6,9 +8,9 @@ import { router, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useState } from 'react';
 import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { favoriteService } from '@/services/favoriteService';
 
 export default function RestaurantDetailsScreen() {
+    const { theme } = useTheme();
     const { id } = useLocalSearchParams();
     const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
     const [reviews, setReviews] = useState<Review[]>([]);
@@ -88,11 +90,11 @@ export default function RestaurantDetailsScreen() {
 
     if (error || !restaurant) {
         return (
-            <SafeAreaView style={styles.container}>
+            <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
                 <View style={styles.errorContainer}>
-                    <Text style={styles.errorText}>{error || 'Restaurant not found'}</Text>
-                    <Pressable style={styles.backButton} onPress={() => router.back()}>
-                        <Text style={styles.backButtonText}>← Go Back</Text>
+                    <Text style={[styles.errorText, { color: theme.error }]}>{error || 'Restaurant not found'}</Text>
+                    <Pressable style={[styles.backButton, { backgroundColor: theme.primary }]} onPress={() => router.back()}>
+                        <Text style={[styles.backButtonText, { color: theme.textInverse }]}>← Go Back</Text>
                     </Pressable>
                 </View>
             </SafeAreaView>
@@ -100,7 +102,7 @@ export default function RestaurantDetailsScreen() {
     }
 
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
             <ScrollView showsVerticalScrollIndicator={false}>
                 {/* Hero Image */}
                 <View style={styles.imageContainer}>
@@ -112,7 +114,7 @@ export default function RestaurantDetailsScreen() {
                         />
                     ) : (
                         <LinearGradient
-                            colors={['#e0e7ff', '#c7d2fe'] as [string, string]}
+                            colors={theme.gradientAccent}
                             style={styles.placeholderImage}
                         >
                             <Text style={styles.placeholderIcon}>🍽️</Text>
@@ -159,18 +161,18 @@ export default function RestaurantDetailsScreen() {
                 </View>
 
                 {/* Content Container */}
-                <View style={styles.contentContainer}>
+                <View style={[styles.contentContainer, { backgroundColor: theme.backgroundSecondary }]}>
                     {/* Overall Rating */}
                     <View style={styles.ratingCard}>
                         <LinearGradient
-                            colors={['#ffffff', '#f8f9fb'] as [string, string]}
+                            colors={[theme.cardBackground, theme.surface]}
                             style={styles.ratingGradient}
                         >
                             <View style={styles.ratingHeader}>
-                                <Text style={styles.overallRatingNumber}>{restaurant.overallRating}</Text>
+                                <Text style={[styles.overallRatingNumber, { color: theme.accent }]}>{restaurant.overallRating}</Text>
                                 <View style={styles.ratingDetails}>
                                     {renderStars(restaurant.overallRating)}
-                                    <Text style={styles.reviewCount}>
+                                    <Text style={[styles.reviewCount, { color: theme.textSecondary }]}>
                                         Based on {restaurant.totalReviews} reviews
                                     </Text>
                                 </View>
@@ -180,16 +182,16 @@ export default function RestaurantDetailsScreen() {
 
                     {/* Platform Ratings */}
                     <View style={styles.platformSection}>
-                        <Text style={styles.sectionTitle}>Platform Ratings</Text>
+                        <Text style={[styles.sectionTitle, { color: theme.text }]}>Platform Ratings</Text>
                         <View style={styles.platformRatings}>
                             {Object.entries(restaurant.ratings).map(([platform, rating]) => (
                                 <View key={platform} style={styles.platformRatingCard}>
                                     <LinearGradient
-                                        colors={['#ffffff', '#f8f9fb'] as [string, string]}
+                                        colors={[theme.cardBackground, theme.surface]}
                                         style={styles.platformRatingGradient}
                                     >
                                         <View style={styles.platformHeader}>
-                                            <Text style={styles.platformName}>
+                                            <Text style={[styles.platformName, { color: theme.text }]}>
                                                 {platform.charAt(0).toUpperCase() + platform.slice(1)}
                                             </Text>
                                             <View
@@ -200,9 +202,9 @@ export default function RestaurantDetailsScreen() {
                                             />
                                         </View>
                                         <View style={styles.platformRatingRow}>
-                                            <Text style={styles.platformRatingNumber}>{rating?.rating}</Text>
+                                            <Text style={[styles.platformRatingNumber, { color: theme.accent }]}>{rating?.rating}</Text>
                                             {renderStars(rating?.rating || 0)}
-                                            <Text style={styles.platformReviewCount}>
+                                            <Text style={[styles.platformReviewCount, { color: theme.textSecondary }]}>
                                                 {rating?.reviewCount} reviews
                                             </Text>
                                         </View>
@@ -214,18 +216,18 @@ export default function RestaurantDetailsScreen() {
 
                     {/* Restaurant Details */}
                     <View style={styles.detailsSection}>
-                        <Text style={styles.sectionTitle}>Details</Text>
+                        <Text style={[styles.sectionTitle, { color: theme.text }]}>Details</Text>
                         <View style={styles.detailsCard}>
                             <LinearGradient
-                                colors={['#ffffff', '#f8f9fb'] as [string, string]}
+                                colors={[theme.cardBackground, theme.surface]}
                                 style={styles.detailsGradient}
                             >
                                 {/* Address */}
                                 <View style={styles.detailRow}>
                                     <Text style={styles.detailIcon}>📍</Text>
                                     <View style={styles.detailContent}>
-                                        <Text style={styles.detailLabel}>Address</Text>
-                                        <Text style={styles.detailValue}>
+                                        <Text style={[styles.detailLabel, { color: theme.text }]}>Address</Text>
+                                        <Text style={[styles.detailValue, { color: theme.textSecondary }]}>
                                             {restaurant.address}, {restaurant.city}, {restaurant.state} {restaurant.zipCode}
                                         </Text>
                                     </View>
@@ -236,8 +238,8 @@ export default function RestaurantDetailsScreen() {
                                     <View style={styles.detailRow}>
                                         <Text style={styles.detailIcon}>📞</Text>
                                         <View style={styles.detailContent}>
-                                            <Text style={styles.detailLabel}>Phone</Text>
-                                            <Text style={styles.detailValue}>{restaurant.phone}</Text>
+                                            <Text style={[styles.detailLabel, { color: theme.text }]}>Phone</Text>
+                                            <Text style={[styles.detailValue, { color: theme.textSecondary }]}>{restaurant.phone}</Text>
                                         </View>
                                     </View>
                                 )}
@@ -247,8 +249,8 @@ export default function RestaurantDetailsScreen() {
                                     <View style={styles.detailRow}>
                                         <Text style={styles.detailIcon}>🌐</Text>
                                         <View style={styles.detailContent}>
-                                            <Text style={styles.detailLabel}>Website</Text>
-                                            <Text style={styles.detailValue}>{restaurant.website}</Text>
+                                            <Text style={[styles.detailLabel, { color: theme.text }]}>Website</Text>
+                                            <Text style={[styles.detailValue, { color: theme.textSecondary }]}>{restaurant.website}</Text>
                                         </View>
                                     </View>
                                 )}
@@ -258,15 +260,15 @@ export default function RestaurantDetailsScreen() {
 
                     {/* Features */}
                     <View style={styles.featuresSection}>
-                        <Text style={styles.sectionTitle}>Features</Text>
+                        <Text style={[styles.sectionTitle, { color: theme.text }]}>Features</Text>
                         <View style={styles.featuresGrid}>
                             {restaurant.features.map((feature, index) => (
                                 <View key={index} style={styles.featureItem}>
                                     <LinearGradient
-                                        colors={['#e0e7ff', '#c7d2fe'] as [string, string]}
+                                        colors={theme.gradientAccent}
                                         style={styles.featureGradient}
                                     >
-                                        <Text style={styles.featureText}>
+                                        <Text style={[styles.featureText, { color: theme.textInverse }]}>
                                             {feature.name.replace(/_/g, ' ')}
                                         </Text>
                                     </LinearGradient>
@@ -278,30 +280,30 @@ export default function RestaurantDetailsScreen() {
                     {/* Recent Reviews */}
                     {reviews.length > 0 && (
                         <View style={styles.reviewsSection}>
-                            <Text style={styles.sectionTitle}>Recent Reviews</Text>
+                            <Text style={[styles.sectionTitle, { color: theme.text }]}>Recent Reviews</Text>
                             {reviews.map((review, index) => (
                                 <View key={review.id} style={styles.reviewCard}>
                                     <LinearGradient
-                                        colors={['#ffffff', '#f8f9fb'] as [string, string]}
+                                        colors={[theme.cardBackground, theme.surface]}
                                         style={styles.reviewGradient}
                                     >
                                         <View style={styles.reviewHeader}>
                                             <View style={styles.reviewAuthor}>
-                                                <Text style={styles.authorName}>{review.author.name}</Text>
-                                                <Text style={styles.reviewPlatform}>
+                                                <Text style={[styles.authorName, { color: theme.text }]}>{review.author.name}</Text>
+                                                <Text style={[styles.reviewPlatform, { color: theme.textSecondary }]}>
                                                     via {review.platform.charAt(0).toUpperCase() + review.platform.slice(1)}
                                                 </Text>
                                             </View>
                                             <View style={styles.reviewRating}>
-                                                <Text style={styles.reviewRatingNumber}>{review.rating}</Text>
+                                                <Text style={[styles.reviewRatingNumber, { color: theme.accent }]}>{review.rating}</Text>
                                                 {renderStars(review.rating)}
                                             </View>
                                         </View>
                                         {review.title && (
-                                            <Text style={styles.reviewTitle}>{review.title}</Text>
+                                            <Text style={[styles.reviewTitle, { color: theme.text }]}>{review.title}</Text>
                                         )}
-                                        <Text style={styles.reviewContent}>{review.content}</Text>
-                                        <Text style={styles.reviewDate}>
+                                        <Text style={[styles.reviewContent, { color: theme.textSecondary }]}>{review.content}</Text>
+                                        <Text style={[styles.reviewDate, { color: theme.textTertiary }]}>
                                             {new Date(review.date).toLocaleDateString()}
                                         </Text>
                                     </LinearGradient>

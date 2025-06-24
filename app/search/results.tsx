@@ -1,5 +1,6 @@
 import { LoadingState } from '@/components/common/LoadingState';
 import { RestaurantCard } from '@/components/restaurant/RestaurantCard';
+import { useTheme } from '@/contexts/ThemeContext';
 import { favoriteService } from '@/services/favoriteService';
 import { searchRestaurants } from '@/services/mockData';
 import { Restaurant, SearchResult } from '@/types';
@@ -10,6 +11,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function SearchResultsScreen() {
+    const { theme } = useTheme();
     const params = useLocalSearchParams();
     const [searchResult, setSearchResult] = useState<SearchResult | null>(null);
     const [loading, setLoading] = useState(true);
@@ -53,12 +55,12 @@ export default function SearchResultsScreen() {
     const renderEmptyState = () => (
         <View style={styles.emptyStateCard}>
             <LinearGradient
-                colors={['#ffffff', '#f8f9fb'] as [string, string]}
+                colors={[theme.cardBackground, theme.surface]}
                 style={styles.emptyStateGradient}
             >
                 <Text style={styles.emptyStateIcon}>🔍</Text>
-                <Text style={styles.emptyStateTitle}>No Results Found</Text>
-                <Text style={styles.emptyStateText}>
+                <Text style={[styles.emptyStateTitle, { color: theme.text }]}>No Results Found</Text>
+                <Text style={[styles.emptyStateText, { color: theme.textSecondary }]}>
                     We couldn't find any restaurants matching your search.
                     Try adjusting your search terms or location.
                 </Text>
@@ -67,7 +69,7 @@ export default function SearchResultsScreen() {
                     onPress={() => router.back()}
                 >
                     <LinearGradient
-                        colors={['#667eea', '#764ba2'] as [string, string]}
+                        colors={theme.gradientPrimary}
                         style={styles.retryButtonGradient}
                     >
                         <Text style={styles.retryButtonText}>← Back to Search</Text>
@@ -83,11 +85,11 @@ export default function SearchResultsScreen() {
 
     if (error) {
         return (
-            <SafeAreaView style={styles.container}>
+            <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
                 <View style={styles.errorContainer}>
-                    <Text style={styles.errorText}>{error}</Text>
+                    <Text style={[styles.errorText, { color: theme.error }]}>{error}</Text>
                     <Pressable style={styles.retryButton} onPress={performSearch}>
-                        <Text style={styles.retryButtonText}>Retry</Text>
+                        <Text style={[styles.retryButtonText, { color: theme.textInverse }]}>Retry</Text>
                     </Pressable>
                 </View>
             </SafeAreaView>
@@ -95,9 +97,9 @@ export default function SearchResultsScreen() {
     }
 
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
             <LinearGradient
-                colors={['#667eea', '#764ba2'] as [string, string]}
+                colors={theme.gradientPrimary}
                 style={styles.backgroundGradient}
             >
                 <ScrollView showsVerticalScrollIndicator={false}>
@@ -112,15 +114,15 @@ export default function SearchResultsScreen() {
                     </View>
 
                     {/* Content Container */}
-                    <View style={styles.contentContainer}>
+                    <View style={[styles.contentContainer, { backgroundColor: theme.backgroundSecondary }]}>
                         {searchResult && searchResult.restaurants.length > 0 ? (
                             <>
                                 {/* Results Header */}
                                 <View style={styles.resultsHeader}>
-                                    <Text style={styles.resultsCount}>
+                                    <Text style={[styles.resultsCount, { color: theme.text }]}>
                                         {searchResult.totalCount} Results
                                     </Text>
-                                    <Text style={styles.searchParams}>
+                                    <Text style={[styles.searchParams, { color: theme.textSecondary }]}>
                                         {query || 'All restaurants'}
                                         {location && ` • ${location}`}
                                     </Text>
@@ -142,7 +144,7 @@ export default function SearchResultsScreen() {
                                 {searchResult.hasMore && (
                                     <Pressable style={styles.loadMoreButton}>
                                         <LinearGradient
-                                            colors={['#667eea', '#764ba2'] as [string, string]}
+                                            colors={theme.gradientPrimary}
                                             style={styles.loadMoreGradient}
                                         >
                                             <Text style={styles.loadMoreText}>Load More Results</Text>

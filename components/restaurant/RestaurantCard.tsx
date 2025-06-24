@@ -1,3 +1,4 @@
+import { useTheme } from '@/contexts/ThemeContext';
 import { favoriteService } from '@/services/favoriteService';
 import { Restaurant } from '@/types';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -12,6 +13,7 @@ interface RestaurantCardProps {
 }
 
 export function RestaurantCard({ restaurant, onPress, showIndex, onFavoriteToggle }: RestaurantCardProps) {
+    const { theme } = useTheme();
     const [isFavorite, setIsFavorite] = useState(false);
     const [favoriteLoading, setFavoriteLoading] = useState(false);
 
@@ -64,7 +66,7 @@ export function RestaurantCard({ restaurant, onPress, showIndex, onFavoriteToggl
     return (
         <Pressable style={styles.cardContainer} onPress={onPress}>
             <LinearGradient
-                colors={['#ffffff', '#f8f9fb'] as [string, string]}
+                colors={[theme.cardBackground, theme.surface]}
                 style={styles.card}
             >
                 {/* Index Badge */}
@@ -104,10 +106,10 @@ export function RestaurantCard({ restaurant, onPress, showIndex, onFavoriteToggl
                     {/* Header */}
                     <View style={styles.headerRow}>
                         <View style={styles.nameContainer}>
-                            <Text style={styles.restaurantName} numberOfLines={1}>
+                            <Text style={[styles.restaurantName, { color: theme.text }]} numberOfLines={1}>
                                 {restaurant.name}
                             </Text>
-                            <Text style={styles.priceRange}>
+                            <Text style={[styles.priceRange, { color: theme.textSecondary }]}>
                                 {renderPriceRange(restaurant.priceRange)}
                             </Text>
                         </View>
@@ -116,9 +118,9 @@ export function RestaurantCard({ restaurant, onPress, showIndex, onFavoriteToggl
                     {/* Rating */}
                     <View style={styles.ratingContainer}>
                         <View style={styles.overallRating}>
-                            <Text style={styles.ratingNumber}>{restaurant.overallRating}</Text>
+                            <Text style={[styles.ratingNumber, { color: theme.text }]}>{restaurant.overallRating}</Text>
                             {renderStars(restaurant.overallRating)}
-                            <Text style={styles.reviewCount}>
+                            <Text style={[styles.reviewCount, { color: theme.textSecondary }]}>
                                 ({restaurant.totalReviews} reviews)
                             </Text>
                         </View>
@@ -136,7 +138,7 @@ export function RestaurantCard({ restaurant, onPress, showIndex, onFavoriteToggl
                     {/* Address */}
                     <View style={styles.addressContainer}>
                         <Text style={styles.addressIcon}>📍</Text>
-                        <Text style={styles.addressText} numberOfLines={1}>
+                        <Text style={[styles.addressText, { color: theme.textSecondary }]} numberOfLines={1}>
                             {restaurant.address}, {restaurant.city}
                         </Text>
                     </View>

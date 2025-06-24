@@ -1,3 +1,4 @@
+import { useTheme } from '@/contexts/ThemeContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import React, { useState } from 'react';
@@ -5,6 +6,7 @@ import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function SearchScreen() {
+    const { theme } = useTheme();
     const [searchQuery, setSearchQuery] = useState('');
     const [location, setLocation] = useState('');
     const [focusedInput, setFocusedInput] = useState<string | null>(null);
@@ -19,9 +21,9 @@ export default function SearchScreen() {
     };
 
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
             <LinearGradient
-                colors={['#667eea', '#764ba2'] as [string, string]}
+                colors={theme.gradientPrimary}
                 style={styles.backgroundGradient}
             >
                 <ScrollView showsVerticalScrollIndicator={false}>
@@ -37,52 +39,52 @@ export default function SearchScreen() {
                     </View>
 
                     {/* Content Container */}
-                    <View style={styles.contentContainer}>
+                    <View style={[styles.contentContainer, { backgroundColor: theme.backgroundSecondary }]}>
                         {/* Search Form */}
                         <View style={styles.searchForm}>
                             <View style={styles.inputGroup}>
-                                <Text style={styles.inputLabel}>Restaurant Name</Text>
+                                <Text style={[styles.inputLabel, { color: theme.text }]}>Restaurant Name</Text>
                                 <View style={[
                                     styles.inputContainer,
                                     focusedInput === 'restaurant' && styles.inputContainerFocused
                                 ]}>
                                     <LinearGradient
-                                        colors={['#ffffff', '#f8f9fb'] as [string, string]}
+                                        colors={[theme.cardBackground, theme.surface]}
                                         style={styles.inputGradient}
                                     >
                                         <Text style={styles.inputIcon}>🏪</Text>
                                         <TextInput
-                                            style={styles.textInput}
+                                            style={[styles.textInput, { color: theme.text }]}
                                             placeholder="Enter restaurant name..."
                                             value={searchQuery}
                                             onChangeText={setSearchQuery}
                                             onFocus={() => setFocusedInput('restaurant')}
                                             onBlur={() => setFocusedInput(null)}
-                                            placeholderTextColor="#9ca3af"
+                                            placeholderTextColor={theme.textTertiary}
                                         />
                                     </LinearGradient>
                                 </View>
                             </View>
 
                             <View style={styles.inputGroup}>
-                                <Text style={styles.inputLabel}>Location</Text>
+                                <Text style={[styles.inputLabel, { color: theme.text }]}>Location</Text>
                                 <View style={[
                                     styles.inputContainer,
                                     focusedInput === 'location' && styles.inputContainerFocused
                                 ]}>
                                     <LinearGradient
-                                        colors={['#ffffff', '#f8f9fb'] as [string, string]}
+                                        colors={[theme.cardBackground, theme.surface]}
                                         style={styles.inputGradient}
                                     >
                                         <Text style={styles.inputIcon}>📍</Text>
                                         <TextInput
-                                            style={styles.textInput}
+                                            style={[styles.textInput, { color: theme.text }]}
                                             placeholder="Enter city, address, or zip code..."
                                             value={location}
                                             onChangeText={setLocation}
                                             onFocus={() => setFocusedInput('location')}
                                             onBlur={() => setFocusedInput(null)}
-                                            placeholderTextColor="#9ca3af"
+                                            placeholderTextColor={theme.textTertiary}
                                         />
                                     </LinearGradient>
                                 </View>
@@ -99,8 +101,8 @@ export default function SearchScreen() {
                                 <LinearGradient
                                     colors={
                                         (!searchQuery.trim() && !location.trim())
-                                            ? ['#9ca3af', '#6b7280'] as [string, string]
-                                            : ['#f093fb', '#f5576c'] as [string, string]
+                                            ? [theme.textTertiary, theme.textSecondary]
+                                            : theme.gradientSecondary
                                     }
                                     style={styles.searchButton}
                                 >
@@ -114,29 +116,29 @@ export default function SearchScreen() {
                         {/* Search Tips */}
                         <View style={styles.tipsCard}>
                             <LinearGradient
-                                colors={['#ffffff', '#f8f9fb'] as [string, string]}
+                                colors={[theme.cardBackground, theme.surface]}
                                 style={styles.tipsGradient}
                             >
                                 <View style={styles.tipsHeader}>
                                     <Text style={styles.tipsIcon}>💡</Text>
-                                    <Text style={styles.tipsTitle}>Search Tips</Text>
+                                    <Text style={[styles.tipsTitle, { color: theme.text }]}>Search Tips</Text>
                                 </View>
                                 <View style={styles.tipsList}>
                                     <View style={styles.tipItem}>
-                                        <Text style={styles.tipBullet}>•</Text>
-                                        <Text style={styles.tipText}>
+                                        <Text style={[styles.tipBullet, { color: theme.textSecondary }]}>•</Text>
+                                        <Text style={[styles.tipText, { color: theme.textSecondary }]}>
                                             Enter just a restaurant name to search globally
                                         </Text>
                                     </View>
                                     <View style={styles.tipItem}>
-                                        <Text style={styles.tipBullet}>•</Text>
-                                        <Text style={styles.tipText}>
+                                        <Text style={[styles.tipBullet, { color: theme.textSecondary }]}>•</Text>
+                                        <Text style={[styles.tipText, { color: theme.textSecondary }]}>
                                             Add location for local results
                                         </Text>
                                     </View>
                                     <View style={styles.tipItem}>
-                                        <Text style={styles.tipBullet}>•</Text>
-                                        <Text style={styles.tipText}>
+                                        <Text style={[styles.tipBullet, { color: theme.textSecondary }]}>•</Text>
+                                        <Text style={[styles.tipText, { color: theme.textSecondary }]}>
                                             Try searching by cuisine type (e.g., "Italian", "Sushi")
                                         </Text>
                                     </View>
@@ -146,7 +148,7 @@ export default function SearchScreen() {
 
                         {/* Popular Searches */}
                         <View style={styles.popularSection}>
-                            <Text style={styles.sectionTitle}>Popular Searches</Text>
+                            <Text style={[styles.sectionTitle, { color: theme.text }]}>Popular Searches</Text>
                             <View style={styles.popularTags}>
                                 {['Pizza', 'Sushi', 'Burger', 'Thai', 'Mexican', 'Italian'].map((tag) => (
                                     <Pressable
@@ -155,10 +157,10 @@ export default function SearchScreen() {
                                         onPress={() => setSearchQuery(tag)}
                                     >
                                         <LinearGradient
-                                            colors={['#e0e7ff', '#c7d2fe'] as [string, string]}
+                                            colors={theme.gradientAccent}
                                             style={styles.popularTag}
                                         >
-                                            <Text style={styles.popularTagText}>{tag}</Text>
+                                            <Text style={[styles.popularTagText, { color: theme.textInverse }]}>{tag}</Text>
                                         </LinearGradient>
                                     </Pressable>
                                 ))}

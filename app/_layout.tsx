@@ -1,9 +1,9 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
 
+import { ThemeProvider } from '@/contexts/ThemeContext';
 import { useColorScheme } from '@/hooks/useColorScheme';
 
 export default function RootLayout() {
@@ -18,7 +18,7 @@ export default function RootLayout() {
   }
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+    <ThemeProvider>
       <Stack>
         <Stack.Screen
           name="index"
@@ -52,6 +52,20 @@ export default function RootLayout() {
           name="history/index"
           options={{
             title: 'Search History',
+            headerBackTitle: 'Home'
+          }}
+        />
+        <Stack.Screen
+          name="settings/index"
+          options={{
+            title: 'Settings',
+            headerBackTitle: 'Home'
+          }}
+        />
+        <Stack.Screen
+          name="about/index"
+          options={{
+            title: 'About',
             headerBackTitle: 'Home'
           }}
         />

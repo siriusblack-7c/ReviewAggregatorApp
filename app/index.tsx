@@ -1,4 +1,4 @@
-import { useColorScheme } from '@/hooks/useColorScheme';
+import { useTheme } from '@/contexts/ThemeContext';
 import { favoriteService, SearchHistoryItem } from '@/services/favoriteService';
 import { useFocusEffect } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -43,7 +43,7 @@ function NavigationCard({ title, subtitle, icon, colors, onPress }: NavigationCa
 }
 
 export default function HomePage() {
-    const colorScheme = useColorScheme();
+    const { theme, isDark, toggleTheme } = useTheme();
     const [recentActivity, setRecentActivity] = useState<SearchHistoryItem[]>([]);
     const [activityLoading, setActivityLoading] = useState(true);
 
@@ -78,28 +78,35 @@ export default function HomePage() {
             subtitle: "Find reviews from all platforms",
             icon: "🔍",
             route: "/search",
-            colors: ['#667eea', '#764ba2'] as [string, string]
+            colors: theme.gradientPrimary
         },
         {
             title: "My Favorites",
             subtitle: "Your saved restaurants",
             icon: "⭐",
             route: "/favorites",
-            colors: ['#f093fb', '#f5576c'] as [string, string]
+            colors: theme.gradientSecondary
         },
         {
             title: "Search History",
             subtitle: "Recent searches",
             icon: "📱",
             route: "/history",
-            colors: ['#4facfe', '#00f2fe'] as [string, string]
+            colors: theme.gradientAccent
+        },
+        {
+            title: "Settings",
+            subtitle: "Customize your experience",
+            icon: "⚙️",
+            route: "/settings",
+            colors: ['#a8edea', '#fed6e3'] as [string, string]
         },
         {
             title: "About",
             subtitle: "App information",
             icon: "ℹ️",
             route: "/about",
-            colors: ['#a8edea', '#fed6e3'] as [string, string]
+            colors: ['#c3a6ff', '#b794f6'] as [string, string]
         }
     ];
 
@@ -108,9 +115,9 @@ export default function HomePage() {
     };
 
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
             <LinearGradient
-                colors={['#667eea', '#764ba2']}
+                colors={theme.gradientPrimary}
                 style={styles.backgroundGradient}
             >
                 <ScrollView showsVerticalScrollIndicator={false}>
@@ -119,26 +126,41 @@ export default function HomePage() {
                         <View style={styles.heroIconContainer}>
                             <Text style={styles.heroIcon}>🍽️</Text>
                         </View>
-                        <Text style={styles.heroTitle}>Review Aggregator</Text>
-                        <Text style={styles.heroSubtitle}>
+                        <Text style={[styles.heroTitle, { color: theme.textInverse }]}>Review Aggregator</Text>
+                        <Text style={[styles.heroSubtitle, { color: 'rgba(255, 255, 255, 0.9)' }]}>
                             Discover the best restaurants with reviews from every platform
                         </Text>
+
+                        {/* Theme Toggle Button */}
+                        <Pressable
+                            style={styles.themeToggle}
+                            onPress={toggleTheme}
+                        >
+                            <LinearGradient
+                                colors={['rgba(255,255,255,0.2)', 'rgba(255,255,255,0.1)']}
+                                style={styles.themeToggleGradient}
+                            >
+                                <Text style={styles.themeToggleText}>
+                                    {isDark ? '☀️ Light Mode' : '🌙 Dark Mode'}
+                                </Text>
+                            </LinearGradient>
+                        </Pressable>
                     </View>
 
                     {/* Quick Search Section */}
-                    <View style={styles.contentContainer}>
+                    <View style={[styles.contentContainer, { backgroundColor: theme.backgroundSecondary }]}>
                         <View style={styles.quickSearchSection}>
-                            <Text style={styles.sectionTitle}>Quick Search</Text>
+                            <Text style={[styles.sectionTitle, { color: theme.text }]}>Quick Search</Text>
                             <Pressable
                                 style={styles.quickSearchBar}
                                 onPress={() => handleNavigation('/search')}
                             >
                                 <LinearGradient
-                                    colors={['#ffffff', '#f8f9fb']}
+                                    colors={[theme.cardBackground, theme.surface]}
                                     style={styles.quickSearchGradient}
                                 >
                                     <Text style={styles.quickSearchIcon}>🔍</Text>
-                                    <Text style={styles.quickSearchPlaceholder}>
+                                    <Text style={[styles.quickSearchPlaceholder, { color: theme.textSecondary }]}>
                                         Search for restaurants...
                                     </Text>
                                 </LinearGradient>
@@ -147,7 +169,7 @@ export default function HomePage() {
 
                         {/* Navigation Grid */}
                         <View style={styles.navigationSection}>
-                            <Text style={styles.sectionTitle}>Explore</Text>
+                            <Text style={[styles.sectionTitle, { color: theme.text }]}>Explore</Text>
                             <View style={styles.navigationGrid}>
                                 {navigationOptions.map((option, index) => (
                                     <NavigationCard
@@ -165,26 +187,26 @@ export default function HomePage() {
 
                         {/* Recent Activity Section */}
                         <View style={styles.recentSection}>
-                            <Text style={styles.sectionTitle}>Recent Activity</Text>
+                            <Text style={[styles.sectionTitle, { color: theme.text }]}>Recent Activity</Text>
                             {activityLoading ? (
                                 <View style={styles.emptyStateCard}>
                                     <LinearGradient
-                                        colors={['#ffffff', '#f8f9fb']}
+                                        colors={[theme.cardBackground, theme.surface]}
                                         style={styles.emptyStateGradient}
                                     >
                                         <Text style={styles.emptyStateIcon}>⏳</Text>
-                                        <Text style={styles.emptyStateText}>Loading recent activity...</Text>
+                                        <Text style={[styles.emptyStateText, { color: theme.text }]}>Loading recent activity...</Text>
                                     </LinearGradient>
                                 </View>
                             ) : recentActivity.length === 0 ? (
                                 <View style={styles.emptyStateCard}>
                                     <LinearGradient
-                                        colors={['#ffffff', '#f8f9fb']}
+                                        colors={[theme.cardBackground, theme.surface]}
                                         style={styles.emptyStateGradient}
                                     >
                                         <Text style={styles.emptyStateIcon}>📊</Text>
-                                        <Text style={styles.emptyStateText}>No recent activity yet</Text>
-                                        <Text style={styles.emptyStateSubtext}>
+                                        <Text style={[styles.emptyStateText, { color: theme.text }]}>No recent activity yet</Text>
+                                        <Text style={[styles.emptyStateSubtext, { color: theme.textSecondary }]}>
                                             Start searching for restaurants to see your activity here
                                         </Text>
                                     </LinearGradient>
@@ -198,25 +220,25 @@ export default function HomePage() {
                                             onPress={() => handleRecentActivityPress(item)}
                                         >
                                             <LinearGradient
-                                                colors={['#ffffff', '#f8f9fb']}
+                                                colors={[theme.cardBackground, theme.surface]}
                                                 style={styles.recentActivityGradient}
                                             >
                                                 <View style={styles.recentActivityIcon}>
                                                     <Text style={styles.recentActivityIconText}>🔍</Text>
                                                 </View>
                                                 <View style={styles.recentActivityContent}>
-                                                    <Text style={styles.recentActivityQuery} numberOfLines={1}>
+                                                    <Text style={[styles.recentActivityQuery, { color: theme.text }]} numberOfLines={1}>
                                                         {item.query || 'Restaurant search'}
                                                     </Text>
-                                                    <Text style={styles.recentActivityLocation} numberOfLines={1}>
+                                                    <Text style={[styles.recentActivityLocation, { color: theme.textSecondary }]} numberOfLines={1}>
                                                         {item.location || 'All locations'}
                                                     </Text>
-                                                    <Text style={styles.recentActivityTime}>
+                                                    <Text style={[styles.recentActivityTime, { color: theme.textTertiary }]}>
                                                         {new Date(item.timestamp).toLocaleDateString()} • {item.resultCount} results
                                                     </Text>
                                                 </View>
                                                 <View style={styles.recentActivityArrow}>
-                                                    <Text style={styles.recentActivityArrowText}>→</Text>
+                                                    <Text style={[styles.recentActivityArrowText, { color: theme.primary }]}>→</Text>
                                                 </View>
                                             </LinearGradient>
                                         </Pressable>
@@ -228,10 +250,10 @@ export default function HomePage() {
                                         onPress={() => handleNavigation('/history')}
                                     >
                                         <LinearGradient
-                                            colors={['#4facfe', '#00f2fe']}
+                                            colors={theme.gradientAccent}
                                             style={styles.viewAllActivityGradient}
                                         >
-                                            <Text style={styles.viewAllActivityText}>View All History</Text>
+                                            <Text style={[styles.viewAllActivityText, { color: theme.textInverse }]}>View All History</Text>
                                         </LinearGradient>
                                     </Pressable>
                                 </View>
@@ -272,7 +294,6 @@ const styles = StyleSheet.create({
     heroTitle: {
         fontSize: 32,
         fontWeight: 'bold',
-        color: '#ffffff',
         textAlign: 'center',
         marginBottom: 12,
         textShadowColor: 'rgba(0, 0, 0, 0.3)',
@@ -281,13 +302,31 @@ const styles = StyleSheet.create({
     },
     heroSubtitle: {
         fontSize: 16,
-        color: 'rgba(255, 255, 255, 0.9)',
         textAlign: 'center',
         lineHeight: 24,
         paddingHorizontal: 20,
+        marginBottom: 20,
+    },
+    themeToggle: {
+        borderRadius: 20,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.1,
+        shadowRadius: 8,
+        elevation: 8,
+    },
+    themeToggleGradient: {
+        paddingHorizontal: 20,
+        paddingVertical: 12,
+        borderRadius: 20,
+        alignItems: 'center',
+    },
+    themeToggleText: {
+        fontSize: 16,
+        fontWeight: '600',
+        color: '#ffffff',
     },
     contentContainer: {
-        backgroundColor: '#f8f9fb',
         borderTopLeftRadius: 30,
         borderTopRightRadius: 30,
         paddingTop: 30,
@@ -301,7 +340,6 @@ const styles = StyleSheet.create({
     sectionTitle: {
         fontSize: 20,
         fontWeight: 'bold',
-        color: '#2d3748',
         marginBottom: 16,
     },
     quickSearchBar: {
@@ -323,7 +361,6 @@ const styles = StyleSheet.create({
         marginRight: 12,
     },
     quickSearchPlaceholder: {
-        color: '#6b7280',
         fontSize: 16,
         flex: 1,
     },
@@ -410,13 +447,11 @@ const styles = StyleSheet.create({
     emptyStateText: {
         fontSize: 18,
         fontWeight: '600',
-        color: '#374151',
         textAlign: 'center',
         marginBottom: 8,
     },
     emptyStateSubtext: {
         fontSize: 14,
-        color: '#6b7280',
         textAlign: 'center',
         lineHeight: 20,
     },
@@ -456,17 +491,14 @@ const styles = StyleSheet.create({
     recentActivityQuery: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: '#374151',
         marginBottom: 4,
     },
     recentActivityLocation: {
         fontSize: 14,
-        color: '#6b7280',
         lineHeight: 18,
     },
     recentActivityTime: {
         fontSize: 12,
-        color: '#9ca3af',
         lineHeight: 16,
         marginTop: 2,
     },
@@ -480,7 +512,6 @@ const styles = StyleSheet.create({
     },
     recentActivityArrowText: {
         fontSize: 16,
-        color: '#4facfe',
         fontWeight: 'bold',
     },
     viewAllActivityButton: {
@@ -502,6 +533,5 @@ const styles = StyleSheet.create({
     viewAllActivityText: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: '#ffffff',
     },
 }); 

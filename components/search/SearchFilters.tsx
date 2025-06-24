@@ -1,3 +1,4 @@
+import { useTheme } from '@/contexts/ThemeContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import React, { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
@@ -34,6 +35,7 @@ const SORT_OPTIONS = [
 ];
 
 export function SearchFilters({ filters, onFiltersChange, onClose }: SearchFiltersProps) {
+    const { theme } = useTheme();
     const [localFilters, setLocalFilters] = useState<SearchFilters>(filters);
 
     const updateFilters = (updates: Partial<SearchFilters>) => {
@@ -129,14 +131,14 @@ export function SearchFilters({ filters, onFiltersChange, onClose }: SearchFilte
     };
 
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, { backgroundColor: theme.background }]}>
             <LinearGradient
-                colors={['#ffffff', '#f8f9fb'] as [string, string]}
+                colors={[theme.cardBackground, theme.surface]}
                 style={styles.contentGradient}
             >
                 {/* Header */}
                 <View style={styles.header}>
-                    <Text style={styles.headerTitle}>Search Filters</Text>
+                    <Text style={[styles.headerTitle, { color: theme.text }]}>Search Filters</Text>
                     <Pressable onPress={onClose} style={styles.closeButton}>
                         <Text style={styles.closeButtonText}>✕</Text>
                     </Pressable>
@@ -145,7 +147,7 @@ export function SearchFilters({ filters, onFiltersChange, onClose }: SearchFilte
                 <ScrollView showsVerticalScrollIndicator={false}>
                     {/* Cuisine Type */}
                     <View style={styles.section}>
-                        <Text style={styles.sectionTitle}>🍽️ Cuisine Type</Text>
+                        <Text style={[styles.sectionTitle, { color: theme.text }]}>🍽️ Cuisine Type</Text>
                         <View style={styles.optionsGrid}>
                             {CUISINE_TYPES.map(cuisine => {
                                 const isSelected = localFilters.cuisineTypes.includes(cuisine);
@@ -157,14 +159,14 @@ export function SearchFilters({ filters, onFiltersChange, onClose }: SearchFilte
                                     >
                                         <LinearGradient
                                             colors={isSelected
-                                                ? ['#667eea', '#764ba2']
-                                                : ['#f8f9fb', '#e5e7eb']
+                                                ? theme.gradientPrimary
+                                                : [theme.surfaceSecondary, theme.border]
                                             }
                                             style={styles.optionButtonGradient}
                                         >
                                             <Text style={[
                                                 styles.optionButtonText,
-                                                { color: isSelected ? '#ffffff' : '#6b7280' }
+                                                { color: isSelected ? theme.textInverse : theme.textSecondary }
                                             ]}>
                                                 {cuisine}
                                             </Text>

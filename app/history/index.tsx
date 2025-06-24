@@ -1,4 +1,5 @@
 import { LoadingState } from '@/components/common/LoadingState';
+import { useTheme } from '@/contexts/ThemeContext';
 import { favoriteService, SearchHistoryItem } from '@/services/favoriteService';
 import { useFocusEffect } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -8,6 +9,7 @@ import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'r
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function HistoryScreen() {
+    const { theme } = useTheme();
     const [searchHistory, setSearchHistory] = useState<SearchHistoryItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
@@ -64,9 +66,9 @@ export default function HistoryScreen() {
         return <LoadingState message="Loading your search history..." />;
     }
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
             <LinearGradient
-                colors={['#4facfe', '#00f2fe'] as [string, string]}
+                colors={theme.gradientAccent}
                 style={styles.backgroundGradient}
             >
                 <ScrollView
@@ -90,20 +92,20 @@ export default function HistoryScreen() {
                     </View>
 
                     {/* Content Container */}
-                    <View style={styles.contentContainer}>
+                    <View style={[styles.contentContainer, { backgroundColor: theme.backgroundSecondary }]}>
                         {searchHistory.length === 0 ? (
                             <View style={styles.emptyStateContainer}>
                                 {/* Empty State */}
                                 <View style={styles.emptyStateCard}>
                                     <LinearGradient
-                                        colors={['#ffffff', '#f8f9fb'] as [string, string]}
+                                        colors={[theme.cardBackground, theme.surface]}
                                         style={styles.emptyStateGradient}
                                     >
                                         <View style={styles.emptyIconContainer}>
                                             <Text style={styles.emptyStateIcon}>📱</Text>
                                         </View>
-                                        <Text style={styles.emptyTitle}>No Search History</Text>
-                                        <Text style={styles.emptyText}>
+                                        <Text style={[styles.emptyTitle, { color: theme.text }]}>No Search History</Text>
+                                        <Text style={[styles.emptyText, { color: theme.textSecondary }]}>
                                             Your recent searches will appear here. Start searching for restaurants
                                             to build your search history!
                                         </Text>
@@ -175,45 +177,45 @@ export default function HistoryScreen() {
                                 {searchHistory.map((item, index) => (
                                     <Pressable key={item.id} style={styles.historyItem} onPress={() => handleSearchAgain(item)}>
                                         <LinearGradient
-                                            colors={['#ffffff', '#f8f9fb']}
+                                            colors={[theme.cardBackground, theme.surface]}
                                             style={styles.historyItemGradient}
                                         >
                                             <View style={styles.historyItemHeader}>
-                                                <View style={styles.historyNumber}>
-                                                    <Text style={styles.historyItemTextNumber}>
+                                                <View style={[styles.historyNumber, { backgroundColor: theme.primary }]}>
+                                                    <Text style={[styles.historyItemTextNumber, { color: theme.textInverse }]}>
                                                         {index + 1}
                                                     </Text>
                                                 </View>
                                                 <View style={styles.historyItemContent}>
-                                                    <Text style={styles.historyItemQuery} numberOfLines={1}>
+                                                    <Text style={[styles.historyItemQuery, { color: theme.text }]} numberOfLines={1}>
                                                         {item.query}
                                                     </Text>
-                                                    <Text style={styles.historyItemLocation} numberOfLines={1}>
+                                                    <Text style={[styles.historyItemLocation, { color: theme.textSecondary }]} numberOfLines={1}>
                                                         📍 {item.location}
                                                     </Text>
-                                                    <Text style={styles.historyItemTime}>
+                                                    <Text style={[styles.historyItemTime, { color: theme.textTertiary }]}>
                                                         {new Date(item.timestamp).toLocaleDateString()} • {item.resultCount} results
                                                     </Text>
                                                 </View>
                                             </View>
                                             <View style={styles.historyButtons}>
                                                 <Pressable
-                                                    style={styles.historyAction}
+                                                    style={[styles.historyAction, { backgroundColor: theme.primary }]}
                                                     onPress={(e) => {
                                                         e.stopPropagation();
                                                         handleSearchAgain(item);
                                                     }}
                                                 >
-                                                    <Text style={styles.historyActionText}>Search Again</Text>
+                                                    <Text style={[styles.historyActionText, { color: theme.textInverse }]}>Search Again</Text>
                                                 </Pressable>
                                                 <Pressable
-                                                    style={[styles.historyAction, styles.removeAction]}
+                                                    style={[styles.historyAction, styles.removeAction, { backgroundColor: theme.error }]}
                                                     onPress={(e) => {
                                                         e.stopPropagation();
                                                         handleRemoveItem(item.id);
                                                     }}
                                                 >
-                                                    <Text style={styles.historyActionText}>Remove</Text>
+                                                    <Text style={[styles.historyActionText, { color: theme.textInverse }]}>Remove</Text>
                                                 </Pressable>
                                             </View>
                                         </LinearGradient>
